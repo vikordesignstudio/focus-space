@@ -290,9 +290,12 @@
       );
     }
 
-    // --- СТВОРЕННЯ БЛОКУ ---
+    // --- СТВОРЕННЯ БЛОКУ (З ПЕРЕТЯГУВАННЯМ) ---
     function CreateBlockView({ config, setConfig, goBack, startBlock }) {
       const [newTaskTitle, setNewTaskTitle] = useState('');
+      
+      // Стан для функції перетягування
+      const [draggedIndex, setDraggedIndex] = useState(null);
 
       const addTask = () => {
         if (!newTaskTitle.trim()) return;
@@ -311,6 +314,30 @@
         if (config.tasks.length === 0) return alert("Додайте хоча б одну задачу.");
         const tasksWithTime = calculateTaskTimes(config.tasks, config.workDuration, config.distributionMode);
         startBlock({ ...config, tasks: tasksWithTime, startTime: Date.now() });
+      };
+
+      // Функції для перетягування (Drag and Drop)
+      const handleDragStart = (index) => {
+        setDraggedIndex(index);
+      };
+
+      const handleDragEnter = (index) => {
+        // Якщо ми просто навели на ту саму задачу - нічого не робимо
+        if (draggedIndex === null || draggedIndex === index) return;
+
+        const newTasks = [...config.tasks];
+        const draggedItem = newTasks[draggedIndex];
+        
+        // Видаляємо задачу зі старого місця і ставимо на нове
+        newTasks.splice(draggedIndex, 1);
+        newTasks.splice(index, 0, draggedItem);
+        
+        setDraggedIndex(index);
+        setConfig({ ...config, tasks: newTasks });
+      };
+
+      const handleDragEnd = () => {
+        setDraggedIndex(null);
       };
 
       const previewTasks = calculateTaskTimes(config.tasks, config.workDuration, config.distributionMode);
@@ -370,10 +397,28 @@
 
               <div className="space-y-3 mb-4">
                 {previewTasks.map((task, idx) => (
-                  <div key={task.id} className="group flex items-center gap-3 bg-white border border-stone-200 p-3 rounded-xl hover:border-teal-200 transition-colors">
+                  <div 
+                    key={task.id} 
+                    draggable
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragEnter={() => handleDragEnter(idx)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => e.preventDefault()}
+                    className={`group flex items-center gap-2 bg-white border p-3 rounded-xl transition-all ${
+                      draggedIndex === idx 
+                        ? 'opacity-40 border-teal-400 border-dashed bg-teal-50/50' 
+                        : 'border-stone-200 hover:border-teal-200'
+                    }`}
+                  >
+                    {/* Іконка для перетягування */}
+                    <div className="cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 flex items-center justify-center">
+                      <Icon name="drag_indicator" size={20} />
+                    </div>
+
                     <div className="w-6 h-6 flex-shrink-0 rounded-full border border-stone-300 flex items-center justify-center text-xs text-stone-400">
                       {idx + 1}
                     </div>
+                    
                     <input 
                       type="text"
                       value={task.title}
@@ -382,7 +427,7 @@
                         newTasks[idx].title = e.target.value;
                         setConfig({...config, tasks: newTasks});
                       }}
-                      className="flex-grow border-none outline-none bg-transparent text-sm"
+                      className="flex-grow border-none outline-none bg-transparent text-sm ml-1"
                     />
                     
                     {config.distributionMode === 'priority' && (
@@ -405,7 +450,7 @@
                       {~~(task.assignedSeconds / 60)} хв
                     </div>
 
-                    <button onClick={() => removeTask(task.id)} className="text-stone-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => removeTask(task.id)} className="text-stone-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1">
                       <Icon name="delete" size={16} />
                     </button>
                   </div>
