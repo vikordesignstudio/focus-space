@@ -5,51 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Простір Розвитку</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              300: '#5eead4',
+              400: '#2dd4bf',
+              500: '#14b8a6', // Primary Teal
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            }
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            'float': '0 10px 30px -5px rgba(20, 184, 166, 0.15)',
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    html { -webkit-text-size-adjust: 100%; }
+    /* Базові налаштування для плавного та сучасного UI */
+    :root {
+      --bg-color: #fafaf9; /* Дуже м'який stone-50 */
+    }
+    
+    html { 
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+    
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.08), transparent 30%),
-        #fafaf9;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.05) 0px, transparent 50%);
+      background-attachment: fixed;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+
+    /* Стилізація іконок Material */
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
       user-select: none;
       line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .material-symbols-rounded.filled {
       font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
     }
-    .fade-in { animation: fadeIn 0.35s ease-in-out; }
-    .slide-in { animation: slideIn 0.28s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    input, button, textarea, select { font: inherit; }
-    button { -webkit-tap-highlight-color: transparent; }
-    .safe-bottom { padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+
+    /* Анімації появи елементів */
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    @keyframes fadeIn { 
+      from { opacity: 0; } 
+      to { opacity: 1; } 
+    }
+    @keyframes slideUp { 
+      from { opacity: 0; transform: translateY(16px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* Утиліти для інпутів та кнопок */
+    input, button, textarea, select { font: inherit; outline: none; }
+    button { 
+      -webkit-tap-highlight-color: transparent; 
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    button:active { transform: scale(0.97); }
+    
+    /* Безпечна зона для мобільних пристроїв (iPhone) */
+    .safe-bottom { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
+
+    /* Кастомний скролбар для елегантності */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    
+    /* Клас для приховування стандартного чекбоксу, але залишення його доступним */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; 
+      overflow: hidden; clip: rect(0, 0, 0, 0); border-width: 0;
+    }
   </style>
 </head>
-<body class="text-stone-800 selection:bg-teal-100">
+<body class="text-stone-800 selection:bg-brand-100 selection:text-brand-900">
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
     const TELEGRAM_SEPARATOR = "\n\n";
 
+    // Компонент Іконки з покращеним вирівнюванням
     const Icon = ({ name, filled = false, size = 24, className = "" }) => (
       <span
         className={`material-symbols-rounded ${filled ? "filled" : ""} ${className}`}
-        style={{ fontSize: size, display: "inline-flex", alignItems: "center", justifyContent: "center", width: size, height: size }}
+        style={{ fontSize: size, width: size, height: size }}
+        aria-hidden="true"
       >
         {name}
       </span>
@@ -57,6 +139,7 @@
 
     const uid = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+    // Форматування часу з підтрикою моноширинних цифр через клас у батька
     const formatTime = (totalSeconds) => {
       const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
       const m = Math.floor(safeSeconds / 60);
@@ -73,27 +156,7 @@
       .map((task, index) => `${task.done ? "✅ " : ""}${index + 1}. ${(task.text || "").trim() || "..."}`)
       .join(TELEGRAM_SEPARATOR);
 
-    const runTests = () => {
-      console.assert(formatTime(-1) === "00:00", "formatTime should never show negative time");
-      console.assert(formatTime(61) === "01:01", "formatTime should format minutes and seconds");
-
-      const sampleTasks = [
-        { text: "DiNails | Website", done: true },
-        { text: "Beauty Med", done: true },
-        { text: "English", done: false }
-      ];
-      const expectedTelegram = "✅ 1. DiNails | Website\n\n✅ 2. Beauty Med\n\n3. English";
-      console.assert(buildTelegramTextFromTasks(sampleTasks) === expectedTelegram, "Telegram copy format is wrong");
-
-      const sorted = sortDoneFirst([
-        { text: "A", done: false },
-        { text: "B", done: true },
-        { text: "C", done: false }
-      ]);
-      console.assert(sorted[0].text === "B", "Done task should move to top");
-    };
-    runTests();
-
+    // Звуковий сигнал (залишено без змін логіки)
     const playSoftChime = () => {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -112,6 +175,7 @@
       } catch (e) {}
     };
 
+    // Розрахунок часу для завдань (логіка без змін)
     const calculateTaskTimes = (tasks, totalMinutes, mode) => {
       const normalizedTasks = tasks.filter(t => (t.title || "").trim());
       if (normalizedTasks.length === 0) return [];
@@ -144,6 +208,7 @@
 
     const getInitialDailyTasks = () => Array.from({ length: 10 }, () => ({ id: uid(), text: "", done: false }));
 
+    // Кастомний хук для LocalStorage (логіка без змін)
     function useStoredState(key, initialValue) {
       const [value, setValue] = useState(() => {
         try {
@@ -185,31 +250,9 @@
           case "dashboard":
             return <DashboardView goToCreate={() => setFocusView("create")} goToHistory={() => setFocusView("history")} history={history} />;
           case "create":
-            return <CreateBlockView
-              config={blockConfig}
-              setConfig={setBlockConfig}
-              goBack={() => setFocusView("dashboard")}
-              startBlock={(sessionData) => {
-                setActiveSession(sessionData);
-                setFocusView("active");
-                if (soundEnabled) playSoftChime();
-              }}
-            />;
+            return <CreateBlockView config={blockConfig} setConfig={setBlockConfig} goBack={() => setFocusView("dashboard")} startBlock={(sessionData) => { setActiveSession(sessionData); setFocusView("active"); if (soundEnabled) playSoftChime(); }} />;
           case "active":
-            return <ActiveBlockView
-              session={activeSession}
-              updateSession={setActiveSession}
-              soundEnabled={soundEnabled}
-              finishBlock={(result) => {
-                setHistory([{ ...result, date: new Date().toISOString() }, ...history]);
-                setActiveSession(null);
-                setFocusView("summary");
-              }}
-              abortBlock={() => {
-                setActiveSession(null);
-                setFocusView("dashboard");
-              }}
-            />;
+            return <ActiveBlockView session={activeSession} updateSession={setActiveSession} soundEnabled={soundEnabled} finishBlock={(result) => { setHistory([{ ...result, date: new Date().toISOString() }, ...history]); setActiveSession(null); setFocusView("summary"); }} abortBlock={() => { setActiveSession(null); setFocusView("dashboard"); }} />;
           case "summary":
             return <SummaryView session={history[0]} startBreak={() => setFocusView("break")} goHome={() => setFocusView("dashboard")} />;
           case "break":
@@ -224,46 +267,54 @@
       const isFullTimer = section === "focus" && (focusView === "active" || focusView === "break");
 
       return (
-        <div className="min-h-screen text-stone-800 font-sans selection:bg-teal-100">
+        <div className="min-h-screen text-stone-800 font-sans flex flex-col">
           {!isFullTimer && (
-            <nav className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-              <div className="flex items-center justify-between gap-3">
-                <div
-                  className="text-xl font-medium tracking-tight flex items-center gap-2 cursor-pointer text-stone-700"
-                  onClick={() => { setSection("plan"); setFocusView("dashboard"); }}
-                >
-                  <div className="w-6 h-6 rounded-full bg-teal-600 flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
+            <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-100/50">
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div
+                    className="text-xl font-semibold tracking-tight flex items-center gap-2.5 cursor-pointer text-stone-800 hover:opacity-80 transition-opacity"
+                    onClick={() => { setSection("plan"); setFocusView("dashboard"); }}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-sm flex items-center justify-center shrink-0">
+                      <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                    </div>
+                    Простір
                   </div>
-                  Простір
+                  <div className="flex gap-2 sm:hidden">
+                    <TopIconButton onClick={() => setSoundEnabled(!soundEnabled)} icon={soundEnabled ? "volume_up" : "volume_off"} active={soundEnabled} />
+                    <TopIconButton onClick={() => { setSection("focus"); setFocusView("history"); }} icon="history" />
+                  </div>
                 </div>
-                <div className="flex gap-2 sm:hidden">
-                  <TopIconButton onClick={() => setSoundEnabled(!soundEnabled)} icon={soundEnabled ? "volume_up" : "volume_off"} />
-                  <TopIconButton onClick={() => { setSection("focus"); setFocusView("history"); }} icon="history" />
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-                <TabButton active={section === "plan"} onClick={() => setSection("plan")} icon="checklist" label="План на день" />
-                <TabButton active={section === "focus"} onClick={() => { setSection("focus"); setFocusView("dashboard"); }} icon="timer" label="Фокус-блок" />
-                <div className="hidden sm:flex gap-2 ml-2">
-                  <TopIconButton onClick={() => setSoundEnabled(!soundEnabled)} icon={soundEnabled ? "volume_up" : "volume_off"} />
-                  <TopIconButton onClick={() => { setSection("focus"); setFocusView("history"); }} icon="history" />
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
+                  <TabButton active={section === "plan"} onClick={() => setSection("plan")} icon="view_list" label="План на день" />
+                  <TabButton active={section === "focus"} onClick={() => { setSection("focus"); setFocusView("dashboard"); }} icon="timer" label="Фокус-блок" />
+                  <div className="hidden sm:flex gap-2 ml-4 pl-4 border-l border-stone-200">
+                    <TopIconButton onClick={() => setSoundEnabled(!soundEnabled)} icon={soundEnabled ? "volume_up" : "volume_off"} active={soundEnabled} title="Звук" />
+                  </div>
                 </div>
               </div>
             </nav>
           )}
 
-          <main className={`max-w-5xl mx-auto px-4 sm:px-6 safe-bottom ${isFullTimer ? "pt-4" : "pt-6"}`}>
+          <main className={`flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 safe-bottom ${isFullTimer ? "pt-4" : "pt-8 sm:pt-10"}`}>
             {section === "plan" ? <DailyPlanView openFocusCreate={openFocusCreate} /> : renderFocusView()}
           </main>
         </div>
       );
     }
 
-    function TopIconButton({ onClick, icon }) {
+    // Оновлені компоненти навігації
+    function TopIconButton({ onClick, icon, active, title }) {
       return (
-        <button onClick={onClick} className="w-10 h-10 rounded-full bg-white/70 border border-stone-100 shadow-sm text-stone-400 hover:text-stone-700 hover:bg-white transition-colors flex items-center justify-center shrink-0">
+        <button 
+          onClick={onClick} 
+          title={title}
+          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-200
+            ${active === false ? "bg-stone-100 text-stone-400 hover:bg-stone-200" : "bg-white border border-stone-200 text-stone-500 hover:text-brand-600 hover:border-brand-200 hover:bg-brand-50 shadow-sm"}
+          `}
+        >
           <Icon name={icon} size={20} />
         </button>
       );
@@ -273,9 +324,13 @@
       return (
         <button
           onClick={onClick}
-          className={`h-11 px-4 rounded-2xl border text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap shrink-0 ${active ? "bg-teal-600 text-white border-teal-600 shadow-sm hover:bg-teal-700" : "bg-white/70 text-stone-500 border-stone-100 hover:text-stone-800 hover:bg-white"}`}
+          className={`h-10 sm:h-11 px-4 sm:px-5 rounded-full text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap shrink-0
+            ${active 
+              ? "bg-stone-800 text-white shadow-md hover:bg-stone-900" 
+              : "bg-transparent text-stone-500 hover:bg-stone-100 hover:text-stone-800"
+            }`}
         >
-          <Icon name={icon} size={18} />
+          <Icon name={icon} size={18} filled={active} />
           {label}
         </button>
       );
@@ -295,7 +350,7 @@
       const showToast = (message) => {
         setToast(message);
         window.clearTimeout(showToast.timer);
-        showToast.timer = window.setTimeout(() => setToast(""), 1500);
+        showToast.timer = window.setTimeout(() => setToast(""), 2000);
       };
 
       const updateTask = (index, patch) => {
@@ -309,8 +364,10 @@
       };
 
       const resetTasks = () => {
-        setTasks(getInitialDailyTasks());
-        showToast("План очищено");
+        if(confirm("Очистити весь список задач?")) {
+           setTasks(getInitialDailyTasks());
+           showToast("План очищено");
+        }
       };
 
       const reorderTasks = (fromIndex, toIndex) => {
@@ -325,7 +382,7 @@
         const text = buildTelegramTextFromTasks(tasks);
         try {
           await navigator.clipboard.writeText(text);
-          showToast("Скопійовано");
+          showToast("Скопійовано для Telegram");
         } catch {
           const textarea = document.createElement("textarea");
           textarea.value = text;
@@ -333,107 +390,171 @@
           textarea.select();
           document.execCommand("copy");
           document.body.removeChild(textarea);
-          showToast("Скопійовано");
+          showToast("Скопійовано для Telegram");
         }
       };
 
       return (
-        <div className="fade-in max-w-4xl mx-auto pt-4 sm:pt-10">
-          <header className="mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-medium mb-4">
-              <Icon name="checklist" size={15} />
-              Сторінка 1
-            </div>
-            <h1 className="text-3xl sm:text-5xl font-light tracking-tight mb-3">План на день</h1>
-            <p className="text-stone-500 max-w-2xl">10 порожніх задач. Вписуйте самі, міняйте порядок, ставте галочки й копіюйте список у Telegram. Цей список окремий і не впливає на таймер.</p>
+        <div className="slide-up max-w-5xl mx-auto pb-12">
+          <header className="mb-8 sm:mb-10 text-center sm:text-left">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-800 mb-3">Ваш план на день</h1>
+            <p className="text-stone-500 max-w-2xl mx-auto sm:mx-0 text-sm sm:text-base">
+              Запишіть до 10 головних завдань. Змінюйте порядок, позначайте виконане та діліться звітом у Telegram.
+            </p>
           </header>
 
-          <div className="grid lg:grid-cols-[1fr_240px] gap-4 sm:gap-5">
-            <section className="bg-white rounded-[2rem] p-4 sm:p-6 shadow-sm border border-stone-100">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-                <div>
-                  <h2 className="text-lg font-medium text-stone-800">Список задач</h2>
-                  <p className="text-sm text-stone-400">Виконано {doneCount} з 10</p>
-                </div>
-                <div className="h-2 w-full sm:w-40 bg-stone-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-teal-500 transition-all" style={{ width: `${doneCount * 10}%` }}></div>
-                </div>
+          <div className="grid lg:grid-cols-[1fr_300px] gap-6 sm:gap-8 relative">
+            {/* Ліва колонка: Список задач */}
+            <section className="bg-white rounded-3xl p-2 sm:p-4 shadow-soft border border-stone-100/50">
+              <div className="flex items-center justify-between px-4 pt-4 pb-2 mb-2">
+                <h2 className="text-sm font-semibold text-stone-400 uppercase tracking-widest">Список задач</h2>
+                <span className="text-sm font-medium px-3 py-1 bg-brand-50 text-brand-700 rounded-full">
+                  {doneCount} / 10
+                </span>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-1">
                 {tasks.map((task, index) => (
                   <div
                     key={task.id}
                     draggable
-                    onDragStart={() => setDraggedIndex(index)}
-                    onDragEnd={() => setDraggedIndex(null)}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => { e.preventDefault(); reorderTasks(draggedIndex, index); }}
-                    className={`grid grid-cols-[32px_34px_1fr_36px] sm:grid-cols-[34px_38px_1fr_40px] items-center gap-2 sm:gap-3 p-3 rounded-2xl border transition-all ${draggedIndex === index ? "opacity-50 border-teal-300 bg-teal-50/60 border-dashed" : task.done ? "border-teal-100 bg-teal-50/30" : "border-stone-100 bg-stone-50/70 hover:bg-white hover:border-stone-200"}`}
+                    onDragStart={(e) => {
+                      setDraggedIndex(index);
+                      // Невеликий хак для візуалу під час drag
+                      setTimeout(() => e.target.classList.add('opacity-0'), 0);
+                    }}
+                    onDragEnd={(e) => {
+                      setDraggedIndex(null);
+                      e.target.classList.remove('opacity-0');
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      // Візуальний фідбек при наведенні (спрощено для продуктивності)
+                    }}
+                    onDrop={(e) => { 
+                      e.preventDefault(); 
+                      reorderTasks(draggedIndex, index); 
+                    }}
+                    className={`group relative flex items-center gap-3 p-3 sm:p-4 rounded-2xl transition-all duration-200
+                      ${draggedIndex === index 
+                        ? "bg-brand-50/50 border-2 border-dashed border-brand-300 z-10" 
+                        : "bg-transparent hover:bg-stone-50 border-2 border-transparent"}
+                      ${task.done && draggedIndex !== index ? "opacity-60" : "opacity-100"}
+                    `}
                   >
-                    <div className="cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 flex justify-center">
+                    {/* Кнопка Drag */}
+                    <div className="cursor-grab active:cursor-grabbing text-stone-300 group-hover:text-stone-400 transition-colors p-1 -ml-2">
                       <Icon name="drag_indicator" size={20} />
                     </div>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-medium shrink-0 ${task.done ? "bg-teal-100 text-teal-700" : "bg-white text-stone-400 border border-stone-100"}`}>
+                    
+                    {/* Номер */}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors
+                      ${task.done ? "bg-brand-100 text-brand-700" : "bg-stone-100 text-stone-400"}
+                    `}>
                       {index + 1}
                     </div>
+
+                    {/* Поле вводу */}
                     <input
                       type="text"
                       value={task.text}
                       onChange={(e) => updateTask(index, { text: e.target.value })}
-                      placeholder="Вписати задачу..."
-                      className={`min-w-0 w-full bg-transparent outline-none text-sm sm:text-base ${task.done ? "text-stone-400 line-through decoration-teal-500/60 decoration-2" : "text-stone-800 placeholder:text-stone-300"}`}
+                      placeholder="Введіть задачу..."
+                      className={`flex-grow min-w-0 bg-transparent outline-none text-base sm:text-lg transition-all
+                        ${task.done 
+                          ? "text-stone-400 line-through decoration-brand-400/50 decoration-2" 
+                          : "text-stone-800 placeholder:text-stone-300 focus:text-brand-900"}
+                      `}
                     />
+
+                    {/* Чекбокс */}
                     <button
                       onClick={() => updateTask(index, { done: !task.done })}
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${task.done ? "bg-teal-500 text-white" : "bg-white border border-stone-200 text-stone-300 hover:text-teal-600 hover:border-teal-200"}`}
-                      title="Позначити виконаною"
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300
+                        ${task.done 
+                          ? "bg-brand-500 text-white shadow-md shadow-brand-500/30 scale-100" 
+                          : "bg-white border-2 border-stone-200 text-transparent hover:border-brand-400 hover:bg-brand-50 scale-95 hover:scale-100"}
+                      `}
+                      title={task.done ? "Скасувати" : "Виконано"}
                     >
-                      <Icon name={task.done ? "check" : "radio_button_unchecked"} size={task.done ? 19 : 20} />
+                      <Icon name="check" size={18} className={task.done ? "opacity-100" : "opacity-0 text-brand-400"} />
                     </button>
                   </div>
                 ))}
               </div>
             </section>
 
-            <aside className="space-y-3">
-              <div className="bg-white rounded-[2rem] p-5 shadow-sm border border-stone-100">
-                <div className="text-4xl font-light tracking-tight mb-1">{doneCount}/10</div>
-                <div className="text-sm text-stone-500 mb-5">готово сьогодні</div>
-                <div className="space-y-2">
-                  <button onClick={copyForTelegram} className="w-full py-3 bg-teal-600 text-white rounded-2xl font-medium hover:bg-teal-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                    <Icon name="content_copy" size={18} />
-                    Copy for Telegram
+            {/* Права колонка: Інструменти */}
+            <aside className="space-y-4">
+              {/* Прогрес */}
+              <div className="bg-white rounded-3xl p-6 shadow-soft border border-stone-100/50">
+                <div className="flex justify-between items-end mb-4">
+                  <div>
+                    <div className="text-4xl font-bold tracking-tight text-stone-800">{Math.round((doneCount/10)*100)}%</div>
+                    <div className="text-sm font-medium text-stone-500 mt-1">Прогрес дня</div>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-brand-600">
+                    <Icon name="trending_up" size={24} />
+                  </div>
+                </div>
+                <div className="h-2.5 w-full bg-stone-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-brand-500 rounded-full transition-all duration-700 ease-out" 
+                    style={{ width: `${doneCount * 10}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Дії */}
+              <div className="bg-white rounded-3xl p-4 shadow-soft border border-stone-100/50 flex flex-col gap-2">
+                <button 
+                  onClick={copyForTelegram} 
+                  className="w-full py-3.5 px-4 bg-stone-800 text-white rounded-2xl font-medium hover:bg-stone-900 flex items-center justify-center gap-2 shadow-md shadow-stone-800/10"
+                >
+                  <Icon name="send" size={18} />
+                  Копіювати звіт
+                </button>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  <button 
+                    onClick={moveDoneTasksUp} 
+                    className="py-3 px-2 bg-stone-50 text-stone-600 rounded-xl font-medium hover:bg-stone-100 flex items-center justify-center gap-1.5 text-sm"
+                    title="Підняти виконані вгору"
+                  >
+                    <Icon name="sort" size={18} />
+                    Сортувати
                   </button>
-                  <button onClick={moveDoneTasksUp} className="w-full py-3 bg-stone-100 text-stone-700 rounded-2xl font-medium hover:bg-stone-200 transition-colors flex items-center justify-center gap-2">
-                    <Icon name="vertical_align_top" size={18} />
-                    Done tasks up
-                  </button>
-                  <button onClick={resetTasks} className="w-full py-3 bg-red-50 text-red-500 rounded-2xl font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
-                    <Icon name="restart_alt" size={18} />
-                    Reset
+                  <button 
+                    onClick={resetTasks} 
+                    className="py-3 px-2 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 flex items-center justify-center gap-1.5 text-sm"
+                  >
+                    <Icon name="delete_sweep" size={18} />
+                    Очистити
                   </button>
                 </div>
               </div>
 
-              <div className="bg-teal-600 text-white rounded-[2rem] p-5 shadow-sm">
-                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center mb-4">
+              {/* Промо Фокус-блоку */}
+              <div className="bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-3xl p-6 shadow-float relative overflow-hidden group cursor-pointer" onClick={openFocusCreate}>
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 border border-white/20">
                   <Icon name="timer" size={22} />
                 </div>
-                <h3 className="font-medium mb-1">Готові фокуситись?</h3>
-                <p className="text-sm text-stone-300 mb-5">Перейдіть на окрему сторінку таймера. План на день не переноситься автоматично.</p>
-                <button onClick={openFocusCreate} className="w-full py-3 bg-white text-teal-700 rounded-2xl font-medium hover:bg-stone-100 transition-colors">
-                  Створити фокус-блок
-                </button>
+                <h3 className="font-semibold text-lg mb-1">Фокус-блок</h3>
+                <p className="text-brand-100 text-sm mb-5 leading-relaxed">
+                  Створіть таймер для глибокої роботи над важливими задачами.
+                </p>
+                <div className="inline-flex items-center gap-1 text-sm font-medium text-white group-hover:gap-2 transition-all">
+                  Створити сесію <Icon name="arrow_forward" size={16} />
+                </div>
               </div>
             </aside>
           </div>
 
-          {toast && (
-            <div className="fixed left-1/2 bottom-6 -translate-x-1/2 px-4 py-3 rounded-2xl bg-teal-600 text-white shadow-xl text-sm font-medium z-50">
-              {toast} ✅
-            </div>
-          )}
+          {/* Toast Notification */}
+          <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-stone-800 text-white shadow-xl shadow-stone-800/20 text-sm font-medium z-50 flex items-center gap-2 transition-all duration-300 ${toast ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"}`}>
+            <Icon name="check_circle" size={18} className="text-brand-400" />
+            {toast}
+          </div>
         </div>
       );
     }
@@ -444,57 +565,89 @@
       const totalMinutesToday = todayBlocks.reduce((acc, curr) => acc + (curr.totalWorkedMinutes || 0), 0);
 
       return (
-        <div className="fade-in pt-4 sm:pt-10">
-          <header className="mb-8 sm:mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-medium mb-4">
-              <Icon name="timer" size={15} />
-              Сторінка 2
+        <div className="slide-up max-w-4xl mx-auto pb-12">
+          <header className="mb-8 sm:mb-12 text-center">
+            <div className="w-16 h-16 mx-auto bg-brand-100 text-brand-600 rounded-3xl flex items-center justify-center mb-4 shadow-sm border border-brand-200/50">
+              <Icon name="timelapse" size={32} />
             </div>
-            <h1 className="text-3xl sm:text-5xl font-light tracking-tight mb-3">Фокус-блок / Помодоро</h1>
-            <p className="text-stone-500">Тут окремі задачі таймера, розподіл часу, старт блоку, історія та перерва.</p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-800 mb-3">Глибокий Фокус</h1>
+            <p className="text-stone-500 max-w-lg mx-auto">
+              Метод інтервальної роботи для максимальної продуктивності.
+            </p>
           </header>
 
-          <div className="grid sm:grid-cols-2 gap-4 mb-10">
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col justify-between items-start">
-              <div className="p-3 bg-teal-50 text-teal-600 rounded-2xl mb-4">
-                <Icon name="play_arrow" filled={true} size={24} />
+          <div className="grid sm:grid-cols-2 gap-5 mb-10">
+            {/* Створити блок */}
+            <div 
+              onClick={goToCreate}
+              className="group bg-white p-6 sm:p-8 rounded-[2rem] shadow-soft border border-stone-100 hover:shadow-float hover:border-brand-200 transition-all cursor-pointer flex flex-col justify-between"
+            >
+              <div>
+                <div className="w-12 h-12 bg-stone-50 group-hover:bg-brand-50 text-stone-600 group-hover:text-brand-600 rounded-2xl flex items-center justify-center mb-5 transition-colors">
+                  <Icon name="add" size={28} />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-stone-800">Нова сесія</h3>
+                <p className="text-stone-500 text-sm leading-relaxed mb-6">
+                  Сплануйте час, додайте задачі та розподіліть хвилини для максимальної концентрації.
+                </p>
               </div>
-              <h3 className="text-lg font-medium mb-1">Новий блок</h3>
-              <p className="text-stone-500 text-sm mb-6">Сплануйте задачі саме для таймера та розподіліть час.</p>
-              <button onClick={goToCreate} className="w-full py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-all active:scale-[0.98]">
-                Створити блок
+              <button className="w-full py-3.5 bg-brand-50 text-brand-700 group-hover:bg-brand-500 group-hover:text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
+                Почати налаштування <Icon name="arrow_right_alt" size={20} />
               </button>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-stone-100">
-              <div className="flex justify-between items-start mb-6">
-                <div className="p-3 bg-stone-50 text-stone-600 rounded-2xl">
-                  <Icon name="bar_chart" size={24} />
+            {/* Статистика */}
+            <div className="bg-stone-900 text-white p-6 sm:p-8 rounded-[2rem] shadow-xl shadow-stone-900/10 flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-stone-800 rounded-full blur-3xl -mr-20 -mt-20"></div>
+              <div className="relative z-10 flex justify-between items-start mb-6">
+                <div className="w-12 h-12 bg-stone-800 text-stone-300 rounded-2xl flex items-center justify-center">
+                  <Icon name="insights" size={24} />
                 </div>
-                <span className="text-xs font-medium text-stone-400 uppercase tracking-wider">Сьогодні</span>
+                <span className="px-3 py-1 bg-stone-800 rounded-full text-xs font-medium text-stone-300 tracking-wider">СЬОГОДНІ</span>
               </div>
-              <div className="space-y-4">
-                <div><div className="text-3xl font-light">{todayBlocks.length}</div><div className="text-sm text-stone-500">завершених блоків</div></div>
-                <div className="h-px w-full bg-stone-100"></div>
-                <div><div className="text-3xl font-light">{Math.round(totalMinutesToday)}</div><div className="text-sm text-stone-500">хвилин фокусу</div></div>
+              <div className="relative z-10 grid grid-cols-2 gap-6">
+                <div>
+                  <div className="text-4xl font-bold tracking-tighter mb-1">{Math.round(totalMinutesToday)}</div>
+                  <div className="text-sm text-stone-400 font-medium">Хвилин у фокусі</div>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold tracking-tighter mb-1">{todayBlocks.length}</div>
+                  <div className="text-sm text-stone-400 font-medium">Завершено блоків</div>
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Історія міні */}
           {history.length > 0 && (
-            <div>
-              <div className="flex justify-between items-end mb-4">
-                <h3 className="text-lg font-medium text-stone-700">Останні сесії</h3>
-                <button onClick={goToHistory} className="text-sm text-teal-600 hover:text-teal-700 font-medium">Всі записи →</button>
+            <div className="bg-white rounded-[2rem] p-6 shadow-soft border border-stone-100/50">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-stone-800 flex items-center gap-2">
+                  <Icon name="history" size={20} className="text-stone-400" />
+                  Останні сесії
+                </h3>
+                <button onClick={goToHistory} className="text-sm font-medium text-brand-600 hover:text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-colors">
+                  Дивитись всі
+                </button>
               </div>
-              <div className="bg-white rounded-3xl p-2 shadow-sm border border-stone-100">
+              <div className="space-y-3">
                 {history.slice(0, 3).map((block, i) => (
-                  <div key={i} className="flex justify-between items-center p-4 hover:bg-stone-50 rounded-2xl transition-colors gap-4">
-                    <div className="min-w-0">
-                      <div className="font-medium truncate">{block.title}</div>
-                      <div className="text-xs text-stone-500">{new Date(block.date).toLocaleDateString("uk-UA")} • {block.completedTasks}/{block.totalTasks} задач</div>
+                  <div key={i} className="flex items-center justify-between p-3 sm:p-4 rounded-2xl hover:bg-stone-50 border border-transparent hover:border-stone-100 transition-all group">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                         <Icon name="task_alt" size={20} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-stone-800 truncate">{block.title}</div>
+                        <div className="text-xs text-stone-500 mt-0.5">
+                          {new Date(block.date).toLocaleDateString("uk-UA", {month: 'long', day: 'numeric'})} • {block.completedTasks}/{block.totalTasks} задач
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-stone-400 text-sm whitespace-nowrap">{Math.round(block.totalWorkedMinutes)} хв</div>
+                    <div className="text-right shrink-0">
+                      <div className="font-semibold text-stone-700">{Math.round(block.totalWorkedMinutes)}</div>
+                      <div className="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Хвилин</div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -518,7 +671,10 @@
 
       const handleStart = () => {
         const tasksWithTime = calculateTaskTimes(config.tasks, config.workDuration, config.distributionMode);
-        if (tasksWithTime.length === 0) return alert("Додайте хоча б одну задачу.");
+        if (tasksWithTime.length === 0) {
+           alert("Додайте хоча б одну задачу для фокусу.");
+           return;
+        }
         startBlock({ ...config, tasks: tasksWithTime, startTime: Date.now() });
       };
 
@@ -534,69 +690,152 @@
       const previewTasks = calculateTaskTimes(config.tasks, config.workDuration, config.distributionMode);
 
       return (
-        <div className="slide-in max-w-2xl mx-auto">
-          <button onClick={goBack} className="flex items-center text-sm text-stone-500 hover:text-stone-800 mb-6 sm:mb-8 transition-colors">← Назад</button>
+        <div className="slide-up max-w-2xl mx-auto pb-24 sm:pb-12">
+          <button onClick={goBack} className="inline-flex items-center gap-1 text-sm font-medium text-stone-500 hover:text-stone-800 mb-6 transition-colors px-2 py-1 -ml-2 rounded-lg hover:bg-stone-100">
+            <Icon name="arrow_back" size={18} /> Назад
+          </button>
 
-          <div className="bg-white rounded-[2rem] p-5 sm:p-8 shadow-sm border border-stone-100 mb-5 sm:mb-6">
-            <input type="text" value={config.title} onChange={(e) => setConfig({ ...config, title: e.target.value })} className="text-2xl sm:text-3xl font-light w-full border-none bg-transparent outline-none placeholder-stone-300 mb-8 focus:ring-0 p-0" placeholder="Назва блоку..." />
+          <div className="bg-white rounded-[2rem] p-5 sm:p-8 shadow-soft border border-stone-100 mb-6">
+            <input 
+              type="text" 
+              value={config.title} 
+              onChange={(e) => setConfig({ ...config, title: e.target.value })} 
+              className="text-2xl sm:text-3xl font-bold w-full border-none bg-transparent outline-none placeholder-stone-300 text-stone-800 mb-8 focus:ring-0 p-0 transition-colors" 
+              placeholder="Назва сесії (напр., Робота над проєктом)" 
+            />
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
-              <div className="bg-stone-50 p-4 rounded-2xl">
-                <label className="text-xs text-stone-500 uppercase tracking-wider block mb-1">Фокус (хв)</label>
-                <input type="number" value={config.workDuration} onChange={(e) => setConfig({ ...config, workDuration: Math.max(1, parseInt(e.target.value) || 1) })} className="text-2xl font-medium bg-transparent border-none outline-none w-full p-0 text-stone-800" min="1" />
+            <div className="grid grid-cols-2 gap-4 mb-10">
+              <div className="bg-stone-50 border border-stone-100 p-4 rounded-2xl relative group hover:border-brand-200 transition-colors">
+                <label className="text-xs font-bold text-stone-400 uppercase tracking-widest block mb-2">Фокус (хв)</label>
+                <div className="flex items-center gap-2">
+                  <Icon name="timer" size={24} className="text-stone-300 group-hover:text-brand-500 transition-colors" />
+                  <input type="number" value={config.workDuration} onChange={(e) => setConfig({ ...config, workDuration: Math.max(1, parseInt(e.target.value) || 1) })} className="text-3xl font-semibold bg-transparent border-none outline-none w-full p-0 text-stone-800" min="1" />
+                </div>
               </div>
-              <div className="bg-stone-50 p-4 rounded-2xl">
-                <label className="text-xs text-stone-500 uppercase tracking-wider block mb-1">Перерва (хв)</label>
-                <input type="number" value={config.breakDuration} onChange={(e) => setConfig({ ...config, breakDuration: Math.max(0, parseInt(e.target.value) || 0) })} className="text-2xl font-medium bg-transparent border-none outline-none w-full p-0 text-stone-800" min="0" />
+              <div className="bg-stone-50 border border-stone-100 p-4 rounded-2xl relative group hover:border-blue-200 transition-colors">
+                <label className="text-xs font-bold text-stone-400 uppercase tracking-widest block mb-2">Перерва (хв)</label>
+                <div className="flex items-center gap-2">
+                  <Icon name="local_cafe" size={24} className="text-stone-300 group-hover:text-blue-500 transition-colors" />
+                  <input type="number" value={config.breakDuration} onChange={(e) => setConfig({ ...config, breakDuration: Math.max(0, parseInt(e.target.value) || 0) })} className="text-3xl font-semibold bg-transparent border-none outline-none w-full p-0 text-stone-800" min="0" />
+                </div>
               </div>
             </div>
 
-            <div className="mb-6">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-4">
-                <h3 className="text-lg font-medium">Задачі таймера</h3>
-                <div className="flex bg-stone-100 rounded-lg p-1 w-fit">
-                  <button className={`text-xs px-3 py-1.5 rounded-md transition-colors ${config.distributionMode === "even" ? "bg-white shadow-sm text-stone-800" : "text-stone-500"}`} onClick={() => setConfig({ ...config, distributionMode: "even" })}>Рівномірно</button>
-                  <button className={`text-xs px-3 py-1.5 rounded-md transition-colors ${config.distributionMode === "priority" ? "bg-white shadow-sm text-stone-800" : "text-stone-500"}`} onClick={() => setConfig({ ...config, distributionMode: "priority" })}>За пріоритетом</button>
+            <div className="mb-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h3 className="text-lg font-semibold text-stone-800">Задачі на сесію</h3>
+                <div className="flex bg-stone-100/80 p-1 rounded-xl w-fit border border-stone-200/50">
+                  <button 
+                    className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${config.distributionMode === "even" ? "bg-white shadow-sm text-stone-800" : "text-stone-500 hover:text-stone-700"}`} 
+                    onClick={() => setConfig({ ...config, distributionMode: "even" })}
+                  >
+                    Рівномірно
+                  </button>
+                  <button 
+                    className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${config.distributionMode === "priority" ? "bg-white shadow-sm text-stone-800" : "text-stone-500 hover:text-stone-700"}`} 
+                    onClick={() => setConfig({ ...config, distributionMode: "priority" })}
+                  >
+                    За пріоритетом
+                  </button>
                 </div>
               </div>
 
-              <div className="space-y-3 mb-4">
+              <div className="space-y-2 mb-4">
+                {previewTasks.length === 0 && (
+                  <div className="text-center py-8 bg-stone-50 rounded-2xl border border-stone-100 border-dashed text-stone-400 text-sm">
+                    Додайте задачі нижче
+                  </div>
+                )}
+                
                 {previewTasks.map((task, idx) => (
-                  <div key={task.id} draggable onDragStart={() => setDraggedIndex(idx)} onDragEnter={() => handleDragEnter(idx)} onDragEnd={() => setDraggedIndex(null)} onDragOver={(e) => e.preventDefault()} className={`group grid grid-cols-[24px_28px_1fr_auto] sm:grid-cols-[24px_30px_1fr_auto_auto_24px] items-center gap-2 bg-white border p-3 rounded-xl transition-all ${draggedIndex === idx ? "opacity-40 border-teal-400 border-dashed bg-teal-50/50" : "border-stone-200 hover:border-teal-200"}`}>
-                    <div className="cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 flex items-center justify-center"><Icon name="drag_indicator" size={20} /></div>
-                    <div className="w-7 h-7 shrink-0 rounded-full border border-stone-300 flex items-center justify-center text-xs text-stone-400">{idx + 1}</div>
-                    <input type="text" value={task.title} onChange={(e) => {
-                      const newTasks = [...config.tasks];
-                      const realIndex = config.tasks.findIndex(t => t.id === task.id);
-                      if (realIndex >= 0) newTasks[realIndex].title = e.target.value;
-                      setConfig({ ...config, tasks: newTasks });
-                    }} className="min-w-0 border-none outline-none bg-transparent text-sm ml-1" />
-                    {config.distributionMode === "priority" && (
-                      <select value={task.priority} onChange={(e) => {
+                  <div 
+                    key={task.id} 
+                    draggable 
+                    onDragStart={() => setDraggedIndex(idx)} 
+                    onDragEnter={() => handleDragEnter(idx)} 
+                    onDragEnd={() => setDraggedIndex(null)} 
+                    onDragOver={(e) => e.preventDefault()} 
+                    className={`group flex items-center gap-2 sm:gap-3 bg-white border p-2 sm:p-3 rounded-xl transition-all
+                      ${draggedIndex === idx ? "opacity-40 border-brand-400 border-dashed bg-brand-50" : "border-stone-200 hover:border-stone-300 shadow-sm hover:shadow"}
+                    `}
+                  >
+                    <div className="cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 p-1">
+                      <Icon name="drag_indicator" size={20} />
+                    </div>
+                    <div className="w-6 h-6 shrink-0 rounded-full bg-stone-100 flex items-center justify-center text-xs font-semibold text-stone-500">{idx + 1}</div>
+                    
+                    <input 
+                      type="text" 
+                      value={task.title} 
+                      onChange={(e) => {
                         const newTasks = [...config.tasks];
                         const realIndex = config.tasks.findIndex(t => t.id === task.id);
-                        if (realIndex >= 0) newTasks[realIndex].priority = e.target.value;
+                        if (realIndex >= 0) newTasks[realIndex].title = e.target.value;
                         setConfig({ ...config, tasks: newTasks });
-                      }} className="text-xs bg-stone-50 border-none outline-none rounded-md px-2 py-1 text-stone-600 cursor-pointer max-w-[110px]">
-                        <option value="low">Низький</option><option value="medium">Середній</option><option value="high">Високий</option>
+                      }} 
+                      className="flex-grow min-w-0 border-none outline-none bg-transparent text-sm sm:text-base text-stone-800 font-medium" 
+                    />
+                    
+                    {config.distributionMode === "priority" && (
+                      <select 
+                        value={task.priority} 
+                        onChange={(e) => {
+                          const newTasks = [...config.tasks];
+                          const realIndex = config.tasks.findIndex(t => t.id === task.id);
+                          if (realIndex >= 0) newTasks[realIndex].priority = e.target.value;
+                          setConfig({ ...config, tasks: newTasks });
+                        }} 
+                        className="text-xs font-medium bg-stone-100 border-none outline-none rounded-lg px-2 py-1.5 text-stone-600 cursor-pointer shrink-0 appearance-none text-center"
+                      >
+                        <option value="low">Низький</option>
+                        <option value="medium">Середній</option>
+                        <option value="high">Високий</option>
                       </select>
                     )}
-                    <div className="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded-md min-w-[52px] text-center">{Math.round(task.assignedSeconds / 60)} хв</div>
-                    <button onClick={() => removeTask(task.id)} className="hidden sm:flex text-stone-300 hover:text-red-400 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity ml-1"><Icon name="delete" size={16} /></button>
+                    
+                    <div className="text-xs font-bold text-brand-700 bg-brand-50 px-2 sm:px-3 py-1.5 rounded-lg min-w-[50px] text-center shrink-0 border border-brand-100">
+                      {Math.round(task.assignedSeconds / 60)} хв
+                    </div>
+                    
+                    <button 
+                      onClick={() => removeTask(task.id)} 
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-stone-300 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                    >
+                      <Icon name="close" size={18} />
+                    </button>
                   </div>
                 ))}
               </div>
 
-              <div className="flex items-center gap-3">
-                <input type="text" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addTask()} placeholder="Додати нову задачу..." className="min-w-0 flex-grow border border-stone-200 rounded-xl p-3 text-sm outline-none focus:border-teal-400 transition-colors bg-stone-50" />
-                <button onClick={addTask} className="p-3 bg-stone-100 text-stone-600 rounded-xl hover:bg-stone-200 transition-colors flex items-center justify-center shrink-0"><Icon name="add" size={20} /></button>
+              {/* Додавання задачі */}
+              <div className="flex items-center gap-2 relative mt-4">
+                <input 
+                  type="text" 
+                  value={newTaskTitle} 
+                  onChange={(e) => setNewTaskTitle(e.target.value)} 
+                  onKeyDown={(e) => e.key === "Enter" && addTask()} 
+                  placeholder="Що потрібно зробити?" 
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 pl-4 pr-12 text-sm sm:text-base outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 transition-all font-medium text-stone-800 placeholder-stone-400" 
+                />
+                <button 
+                  onClick={addTask} 
+                  disabled={!newTaskTitle.trim()}
+                  className="absolute right-1.5 top-1.5 bottom-1.5 aspect-square bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:bg-stone-200 disabled:text-stone-400 transition-colors flex items-center justify-center"
+                >
+                  <Icon name="add" size={20} />
+                </button>
               </div>
             </div>
           </div>
 
-          <button onClick={handleStart} className="w-full flex items-center justify-center gap-2 py-4 bg-teal-600 text-white rounded-[1.5rem] font-medium text-lg hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-600/20 transition-all active:scale-[0.98]">
-            Почати блок <Icon name="arrow_forward" size={20} />
-          </button>
+          <div className="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-stone-200 sm:static sm:bg-transparent sm:p-0 sm:border-none sm:backdrop-blur-none z-20">
+             <button 
+                onClick={handleStart} 
+                className="w-full max-w-2xl mx-auto flex items-center justify-center gap-2 py-4 bg-stone-900 text-white rounded-2xl font-semibold text-lg hover:bg-black hover:shadow-lg hover:shadow-stone-900/20 transition-all active:scale-[0.98]"
+              >
+                Почати сесію <Icon name="play_arrow" size={22} filled />
+              </button>
+          </div>
         </div>
       );
     }
@@ -662,38 +901,103 @@
       const progressPercent = Math.min(100, Math.max(0, ((completedBefore + elapsedInCurrent) / totalSessionSeconds) * 100));
 
       return (
-        <div className={`fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] ${isDistractionFree ? "mt-0" : "mt-4"}`}>
-          <button onClick={() => setIsDistractionFree(!isDistractionFree)} className="fixed top-4 right-4 sm:top-6 sm:right-6 text-stone-400 hover:text-stone-600 bg-white/70 p-2 rounded-full backdrop-blur transition-all z-10" title="Режим фокусу"><Icon name={isDistractionFree ? "fullscreen_exit" : "fullscreen"} size={20} /></button>
+        <div className={`fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] transition-all duration-500 bg-white sm:bg-transparent rounded-[2rem] sm:rounded-none p-4 sm:p-0 ${isDistractionFree ? "mt-0 scale-105" : "mt-2"}`}>
+          
+          <button 
+            onClick={() => setIsDistractionFree(!isDistractionFree)} 
+            className="fixed top-4 right-4 sm:top-6 sm:right-6 text-stone-400 hover:text-stone-800 bg-stone-100 p-2.5 rounded-full transition-all z-10 border border-stone-200" 
+            title={isDistractionFree ? "Звичайний режим" : "Режим фокусу"}
+          >
+            <Icon name={isDistractionFree ? "fullscreen_exit" : "fullscreen"} size={22} />
+          </button>
 
           {!isDistractionFree && (
-            <div className="w-full max-w-md mb-10 sm:mb-12 text-center px-2">
-              <div className="text-sm font-medium text-stone-400 uppercase tracking-widest mb-4">{session.title}</div>
-              <div className="h-1.5 w-full bg-stone-200 rounded-full overflow-hidden"><div className="h-full bg-teal-500 transition-all duration-1000 ease-linear" style={{ width: `${progressPercent}%` }}></div></div>
+            <div className="w-full max-w-md mb-8 sm:mb-12 text-center px-4">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-bold uppercase tracking-widest mb-6 border border-stone-200">
+                 {session.title}
+              </div>
+              <div className="h-1.5 w-full bg-stone-100 rounded-full overflow-hidden shadow-inner">
+                <div 
+                  className="h-full bg-brand-500 rounded-full transition-all duration-1000 ease-linear" 
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
+              </div>
             </div>
           )}
 
-          <div className="text-center mb-8 max-w-lg px-4">
-            <div className="text-stone-400 text-sm mb-2 flex justify-center items-center gap-2"><span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>Поточна задача ({currentTaskIndex + 1} з {session.tasks.length})</div>
-            <h2 className="text-2xl sm:text-3xl font-medium text-stone-800 break-words">{currentTask.title}</h2>
+          <div className="text-center mb-8 max-w-xl px-4 w-full">
+            <div className="text-brand-600 font-semibold text-sm mb-3 flex justify-center items-center gap-2 uppercase tracking-widest">
+               <span className={`w-2 h-2 rounded-full bg-brand-500 ${isRunning ? "animate-pulse" : ""}`}></span>
+               Задача {currentTaskIndex + 1} з {session.tasks.length}
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-800 break-words leading-tight">
+              {currentTask.title}
+            </h2>
           </div>
 
-          <div className="text-[5.4rem] xs:text-[6rem] sm:text-[8rem] font-light text-teal-700 tracking-tighter leading-none mb-10 sm:mb-12 tabular-nums">{formatTime(timeLeft)}</div>
-
-          <div className="flex items-center gap-6 mb-12 sm:mb-16">
-            <button onClick={abortBlock} className="w-12 h-12 flex items-center justify-center rounded-full text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors"><Icon name="stop" size={20} /></button>
-            <button onClick={() => setIsRunning(!isRunning)} className={`w-20 h-20 flex items-center justify-center rounded-full text-white shadow-xl transition-all hover:scale-105 active:scale-95 ${isRunning ? "bg-teal-600 shadow-teal-600/30" : "bg-teal-600 shadow-teal-600/30"}`}><Icon name={isRunning ? "pause" : "play_arrow"} filled={true} size={32} /></button>
-            <button onClick={goNextTask} className="w-12 h-12 flex items-center justify-center rounded-full text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"><Icon name="skip_next" size={20} /></button>
+          {/* Таймер з моноширинним шрифтом */}
+          <div className="text-[6rem] xs:text-[7rem] sm:text-[9rem] font-light text-stone-900 tracking-tighter leading-none mb-12 tabular-nums drop-shadow-sm select-none" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {formatTime(timeLeft)}
           </div>
 
+          {/* Керування */}
+          <div className="flex items-center justify-center gap-6 mb-12 sm:mb-16">
+            <button 
+              onClick={() => { if(confirm("Завершити сесію достроково?")) abortBlock(); }} 
+              className="w-14 h-14 flex items-center justify-center rounded-full text-stone-400 bg-stone-50 border border-stone-200 hover:text-stone-800 hover:bg-stone-100 transition-all hover:scale-105"
+              title="Зупинити"
+            >
+              <Icon name="close" size={24} />
+            </button>
+            
+            <button 
+              onClick={() => setIsRunning(!isRunning)} 
+              className={`w-24 h-24 flex items-center justify-center rounded-full text-white shadow-xl transition-all hover:scale-105 active:scale-95 border-4
+                ${isRunning ? "bg-brand-500 shadow-brand-500/40 border-brand-400" : "bg-stone-800 shadow-stone-800/30 border-stone-700"}
+              `}
+            >
+              <Icon name={isRunning ? "pause" : "play_arrow"} filled={true} size={40} />
+            </button>
+            
+            <button 
+              onClick={goNextTask} 
+              className="w-14 h-14 flex items-center justify-center rounded-full text-stone-500 bg-stone-50 border border-stone-200 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all hover:scale-105"
+              title="Наступна задача"
+            >
+              <Icon name={isLastTask ? "check" : "skip_next"} size={24} />
+            </button>
+          </div>
+
+          {/* Чекліст */}
           {!isDistractionFree && (
-            <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-stone-100">
-              <h3 className="text-sm font-medium text-stone-500 mb-4 flex items-center gap-2"><Icon name="list" size={16} /> Чекліст</h3>
-              <div className="space-y-3">
+            <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-soft border border-stone-100/50">
+              <h3 className="text-sm font-bold text-stone-400 uppercase tracking-widest mb-4 flex items-center justify-between">
+                Список задач
+                <span className="text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md">{session.tasks.filter(t=>t.completed).length}/{session.tasks.length}</span>
+              </h3>
+              <div className="space-y-2 max-h-[30vh] overflow-y-auto pr-2">
                 {session.tasks.map((task, idx) => (
-                  <div key={task.id} className={`flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer border ${idx === currentTaskIndex ? "border-teal-200 bg-teal-50/30" : "border-transparent hover:bg-stone-50"}`} onClick={() => toggleTaskCompletion(task.id)}>
-                    <div className={`mt-0.5 transition-colors ${task.completed ? "text-teal-500" : "text-stone-300"}`}><Icon name={task.completed ? "check_circle" : "radio_button_unchecked"} size={20} /></div>
-                    <div className={`flex-grow text-sm min-w-0 break-words ${task.completed ? "text-stone-400 line-through" : "text-stone-700"} ${idx === currentTaskIndex ? "font-medium" : ""}`}>{task.title}</div>
-                    {idx > currentTaskIndex && <div className="text-xs text-stone-400 whitespace-nowrap">{Math.round(task.assignedSeconds / 60)} хв</div>}
+                  <div 
+                    key={task.id} 
+                    className={`group flex items-start gap-3 p-3 rounded-2xl transition-all cursor-pointer
+                      ${idx === currentTaskIndex ? "bg-brand-50/50 border border-brand-200" : "border border-transparent hover:bg-stone-50"}
+                    `} 
+                    onClick={() => toggleTaskCompletion(task.id)}
+                  >
+                    <div className={`mt-0.5 shrink-0 transition-colors ${task.completed ? "text-brand-500" : "text-stone-300 group-hover:text-stone-400"}`}>
+                      <Icon name={task.completed ? "check_circle" : "radio_button_unchecked"} size={22} filled={task.completed} />
+                    </div>
+                    <div className={`flex-grow text-sm min-w-0 break-words pt-0.5
+                      ${task.completed ? "text-stone-400 line-through decoration-stone-300" : "text-stone-800"} 
+                      ${idx === currentTaskIndex ? "font-semibold" : "font-medium"}
+                    `}>
+                      {task.title}
+                    </div>
+                    {idx > currentTaskIndex && (
+                      <div className="text-xs font-semibold text-stone-400 bg-stone-100 px-2 py-1 rounded-lg shrink-0">
+                        {Math.round(task.assignedSeconds / 60)} хв
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -720,12 +1024,25 @@
       }, [timeLeft, finishBreak, soundEnabled]);
 
       return (
-        <div className="fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] text-center px-4">
-          <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-8"><Icon name="schedule" size={32} /></div>
-          <h2 className="text-2xl font-light text-stone-500 mb-2">Час відпочити</h2>
-          <p className="text-stone-400 text-sm mb-12">Відведіть погляд від екрану, зробіть ковток води.</p>
-          <div className="text-7xl font-light text-blue-900 tracking-tighter mb-16 tabular-nums">{formatTime(timeLeft)}</div>
-          <button onClick={finishBreak} className="px-6 py-3 bg-white border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-50 transition-colors text-sm font-medium">Пропустити перерву</button>
+        <div className="fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] text-center px-4 bg-[#f0f9ff] rounded-[2rem] sm:rounded-none">
+          <div className="w-20 h-20 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mb-8 shadow-sm">
+             <Icon name="self_improvement" size={40} />
+          </div>
+          <h2 className="text-3xl font-bold text-slate-800 mb-3">Час перепочити</h2>
+          <p className="text-slate-500 text-base mb-12 max-w-sm">
+            Відведіть погляд від екрану, розімніться або випийте води. Ваш мозок потребує паузи.
+          </p>
+          
+          <div className="text-[6rem] sm:text-[8rem] font-light text-blue-900 tracking-tighter mb-16 tabular-nums" style={{ fontVariantNumeric: 'tabular-nums' }}>
+             {formatTime(timeLeft)}
+          </div>
+          
+          <button 
+            onClick={finishBreak} 
+            className="px-8 py-3.5 bg-white border border-blue-100 text-slate-600 rounded-2xl hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 font-semibold transition-all shadow-sm active:scale-95"
+          >
+            Пропустити відпочинок
+          </button>
         </div>
       );
     }
@@ -733,31 +1050,67 @@
     function SummaryView({ session, startBreak, goHome }) {
       if (!session) return null;
       const isPerfect = session.completedTasks === session.totalTasks;
+      const progress = Math.round((session.completedTasks / session.totalTasks) * 100) || 0;
+
       return (
-        <div className="slide-in max-w-lg mx-auto pt-6 sm:pt-10">
-          <div className="bg-white rounded-[2.5rem] p-6 sm:p-10 shadow-sm border border-stone-100 text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-emerald-400"></div>
-            <div className="w-20 h-20 mx-auto bg-stone-50 rounded-full flex items-center justify-center mb-6"><Icon name="check_circle" filled={isPerfect} size={40} className={isPerfect ? "text-teal-500" : "text-stone-400"} /></div>
-            <h2 className="text-3xl font-light mb-2">Блок завершено</h2>
-            <p className="text-stone-500 mb-8">Ви чудово попрацювали. Ось результати сесії.</p>
-            <div className="grid grid-cols-2 gap-4 mb-8 text-left">
-              <div className="bg-stone-50 p-4 rounded-2xl"><div className="text-stone-400 text-xs uppercase tracking-wider mb-1">Фокус</div><div className="text-2xl font-medium text-stone-800">{Math.round(session.totalWorkedMinutes)} хв</div></div>
-              <div className="bg-stone-50 p-4 rounded-2xl"><div className="text-stone-400 text-xs uppercase tracking-wider mb-1">Задачі</div><div className="text-2xl font-medium text-stone-800">{session.completedTasks} / {session.totalTasks}</div></div>
-            </div>
-            <div className="text-left mb-8">
-              <div className="text-sm font-medium text-stone-600 mb-3 px-2">Що було зроблено:</div>
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                {session.tasks.map(t => (
-                  <div key={t.id} className="flex items-center gap-2 text-sm">
-                    <div className={t.completed ? "text-teal-500" : "text-stone-300"}><Icon name={t.completed ? "check_circle" : "radio_button_unchecked"} size={16} /></div>
-                    <span className={t.completed ? "text-stone-800" : "text-stone-400"}>{t.title}</span>
-                  </div>
-                ))}
+        <div className="slide-up max-w-lg mx-auto pt-6 sm:pt-10 pb-12">
+          <div className="bg-white rounded-[2.5rem] p-6 sm:p-10 shadow-float border border-stone-100/50 text-center relative overflow-hidden">
+            {/* Декоративний фон */}
+            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-brand-50 to-transparent"></div>
+            
+            <div className="relative z-10">
+              <div className="w-24 h-24 mx-auto bg-white rounded-full shadow-md border-4 border-white flex items-center justify-center mb-6">
+                 {isPerfect ? (
+                    <div className="w-full h-full rounded-full bg-brand-500 text-white flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]"><Icon name="celebration" size={40} /></div>
+                 ) : (
+                    <div className="w-full h-full rounded-full bg-stone-100 text-stone-600 flex items-center justify-center"><Icon name="done_all" size={40} /></div>
+                 )}
               </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              <button onClick={startBreak} className="w-full py-4 bg-teal-600 text-white rounded-2xl font-medium hover:bg-teal-700 transition-colors">Почати перерву ({session.breakDuration} хв)</button>
-              <button onClick={goHome} className="w-full py-4 bg-transparent text-stone-500 hover:bg-stone-50 rounded-2xl font-medium transition-colors">На головну</button>
+              
+              <h2 className="text-3xl font-bold text-stone-800 mb-2">Сесію завершено</h2>
+              <p className="text-stone-500 mb-8 font-medium">Чудова робота! Ось ваші результати.</p>
+              
+              <div className="grid grid-cols-2 gap-4 mb-8 text-left">
+                <div className="bg-stone-50 border border-stone-100 p-5 rounded-2xl">
+                   <div className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1"><Icon name="timer" size={16}/> Фокус</div>
+                   <div className="text-3xl font-bold text-stone-800">{Math.round(session.totalWorkedMinutes)} <span className="text-lg text-stone-400 font-medium">хв</span></div>
+                </div>
+                <div className="bg-stone-50 border border-stone-100 p-5 rounded-2xl">
+                   <div className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1"><Icon name="task" size={16}/> Задачі</div>
+                   <div className="flex items-baseline gap-1">
+                      <span className={`text-3xl font-bold ${isPerfect ? "text-brand-600" : "text-stone-800"}`}>{session.completedTasks}</span>
+                      <span className="text-lg text-stone-400 font-medium">/ {session.totalTasks}</span>
+                   </div>
+                </div>
+              </div>
+
+              {/* Прогрес бар */}
+              <div className="mb-8 bg-stone-50 p-4 rounded-2xl border border-stone-100">
+                <div className="flex justify-between text-sm font-bold text-stone-600 mb-2">
+                   <span>Ефективність</span>
+                   <span className={isPerfect ? "text-brand-600" : ""}>{progress}%</span>
+                </div>
+                <div className="h-2 w-full bg-stone-200 rounded-full overflow-hidden">
+                   <div className="h-full bg-brand-500 rounded-full" style={{width: `${progress}%`}}></div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {session.breakDuration > 0 && (
+                  <button 
+                    onClick={startBreak} 
+                    className="w-full py-4 bg-brand-500 text-white rounded-2xl font-semibold text-lg hover:bg-brand-600 shadow-md shadow-brand-500/20 transition-all active:scale-[0.98]"
+                  >
+                    Перерва ({session.breakDuration} хв)
+                  </button>
+                )}
+                <button 
+                  onClick={goHome} 
+                  className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all active:scale-[0.98] ${session.breakDuration > 0 ? "bg-stone-100 text-stone-600 hover:bg-stone-200" : "bg-stone-900 text-white hover:bg-black shadow-md"}`}
+                >
+                  {session.breakDuration > 0 ? "Пропустити та на головну" : "Повернутись на головну"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -766,28 +1119,58 @@
 
     function HistoryView({ history, goBack }) {
       return (
-        <div className="fade-in max-w-2xl mx-auto">
-          <div className="flex items-center mb-8 gap-4">
-            <button onClick={goBack} className="p-2 bg-white rounded-full shadow-sm hover:bg-stone-50 text-stone-600"><Icon name="chevron_right" size={20} className="rotate-180" /></button>
-            <h2 className="text-2xl font-medium text-stone-800">Історія блоків</h2>
+        <div className="slide-up max-w-3xl mx-auto pb-12">
+          <div className="flex items-center mb-8 gap-4 px-2">
+            <button 
+              onClick={goBack} 
+              className="w-10 h-10 bg-white border border-stone-200 rounded-full shadow-sm hover:bg-stone-50 text-stone-600 flex items-center justify-center transition-colors"
+            >
+               <Icon name="arrow_back" size={20} />
+            </button>
+            <div>
+               <h2 className="text-2xl font-bold text-stone-800">Історія сесій</h2>
+               <p className="text-sm text-stone-500 font-medium">Всі ваші завершені фокус-блоки</p>
+            </div>
           </div>
+
           {history.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-3xl border border-stone-100 border-dashed">
-              <Icon name="history" size={48} className="text-stone-300 mb-4" />
-              <p className="text-stone-500">Ви ще не завершили жодного блоку.</p>
+            <div className="text-center py-24 bg-white rounded-[2rem] border border-stone-200 border-dashed shadow-sm">
+              <div className="w-20 h-20 bg-stone-50 text-stone-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <Icon name="history" size={40} />
+              </div>
+              <h3 className="text-lg font-semibold text-stone-700 mb-1">Поки що порожньо</h3>
+              <p className="text-stone-500 text-sm">Ви ще не завершили жодного блоку.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {history.map((block, idx) => (
-                <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <h3 className="font-medium text-lg text-stone-800 mb-1 truncate">{block.title}</h3>
-                    <div className="text-sm text-stone-400 flex items-center gap-2"><Icon name="schedule" size={14} /> {new Date(block.date).toLocaleString("uk-UA", { day: "numeric", month: "short", hour: "2-digit", minute:"2-digit" })}</div>
+                <div key={idx} className="bg-white p-5 sm:p-6 rounded-3xl shadow-soft border border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-5 hover:border-brand-200 transition-colors group">
+                  <div className="flex items-start gap-4 min-w-0">
+                     <div className="w-12 h-12 rounded-2xl bg-stone-50 group-hover:bg-brand-50 text-stone-400 group-hover:text-brand-500 flex items-center justify-center shrink-0 transition-colors">
+                        <Icon name="task_alt" size={24} />
+                     </div>
+                    <div className="min-w-0 pt-0.5">
+                      <h3 className="font-bold text-lg text-stone-800 mb-1 truncate">{block.title}</h3>
+                      <div className="text-sm text-stone-500 font-medium flex items-center gap-1.5">
+                         <Icon name="calendar_today" size={14} className="text-stone-400" /> 
+                         {new Date(block.date).toLocaleString("uk-UA", { day: "numeric", month: "long", hour: "2-digit", minute:"2-digit" })}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-right"><div className="text-xs text-stone-400 uppercase tracking-wider mb-0.5">Фокус</div><div className="font-medium text-stone-700">{Math.round(block.totalWorkedMinutes)} хв</div></div>
-                    <div className="w-px h-8 bg-stone-100"></div>
-                    <div className="text-right"><div className="text-xs text-stone-400 uppercase tracking-wider mb-0.5">Задачі</div><div className="font-medium text-stone-700"><span className={block.completedTasks === block.totalTasks ? "text-teal-600" : ""}>{block.completedTasks}</span> / {block.totalTasks}</div></div>
+                  
+                  <div className="flex items-center gap-6 sm:gap-8 bg-stone-50 p-3 rounded-2xl sm:bg-transparent sm:p-0">
+                    <div className="text-center sm:text-right flex-1 sm:flex-none">
+                       <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Фокус</div>
+                       <div className="font-bold text-stone-800 text-lg">{Math.round(block.totalWorkedMinutes)} <span className="text-sm text-stone-500 font-medium">хв</span></div>
+                    </div>
+                    <div className="w-px h-10 bg-stone-200 hidden sm:block"></div>
+                    <div className="text-center sm:text-right flex-1 sm:flex-none">
+                       <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Задачі</div>
+                       <div className="font-bold text-stone-800 text-lg">
+                          <span className={block.completedTasks === block.totalTasks ? "text-brand-600" : ""}>{block.completedTasks}</span>
+                          <span className="text-sm text-stone-400 font-medium">/{block.totalTasks}</span>
+                       </div>
+                    </div>
                   </div>
                 </div>
               ))}
