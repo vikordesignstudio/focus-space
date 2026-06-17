@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Простір Розвитку</title>
+  <!-- compiled-no-babel: JSX has been precompiled, so no browser Babel/import crash -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +14,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -117,48 +117,58 @@
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; 
       overflow: hidden; clip: rect(0, 0, 0, 0); border-width: 0;
     }
+
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body class="text-stone-800 selection:bg-brand-100 selection:text-brand-900">
-  <div id="root"></div>
+  <div id="root"><div style="padding:24px;font-family:Inter,system-ui,sans-serif;color:#78716c;">Завантаження…</div></div>
 
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-    const TELEGRAM_SEPARATOR = "\n\n";
+  <script>
+    window.addEventListener("error", function(event) {
+      var root = document.getElementById("root");
+      if (!root) return;
+      if (!root.dataset.reactMounted) {
+        root.innerHTML = '<div style="max-width:720px;margin:40px auto;padding:24px;border:1px solid #e7e5e4;border-radius:24px;background:white;font-family:Inter,system-ui,sans-serif;color:#292524;box-shadow:0 4px 20px rgba(0,0,0,.05)"><h1 style="font-size:22px;margin:0 0 12px;font-weight:700">Помилка запуску сайту</h1><p style="margin:0 0 12px;color:#57534e;line-height:1.5">Відкрий Console і скопіюй першу червону помилку. Найчастіше це означає, що не завантажився React/Babel CDN або є помилка в JavaScript.</p><pre style="white-space:pre-wrap;background:#fafaf9;border-radius:12px;padding:12px;font-size:13px;color:#991b1b">' + String(event.message || "Unknown error") + '</pre></div>';
+      }
+    });
+    window.setTimeout(function() {
+      var root = document.getElementById("root");
+      if (root && !root.dataset.reactMounted && root.innerText.indexOf("Завантаження") !== -1) {
+        root.innerHTML = '<div style="max-width:720px;margin:40px auto;padding:24px;border:1px solid #e7e5e4;border-radius:24px;background:white;font-family:Inter,system-ui,sans-serif;color:#292524;box-shadow:0 4px 20px rgba(0,0,0,.05)"><h1 style="font-size:22px;margin:0 0 12px;font-weight:700">Скрипт не запустився</h1><p style="margin:0;color:#57534e;line-height:1.5">Перевір Console. Можливо, браузер не завантажив React/Babel з CDN або відкриття через file:// блокує зовнішні скрипти.</p></div>';
+      }
+    }, 5000);
+  </script>
 
-    // Компонент Іконки з покращеним вирівнюванням
-    const Icon = ({ name, filled = false, size = 24, className = "" }) => (
-      <span
-        className={`material-symbols-rounded ${filled ? "filled" : ""} ${className}`}
-        style={{ fontSize: size, width: size, height: size }}
-        aria-hidden="true"
-      >
-        {name}
-      </span>
-    );
-
-    const uid = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-
-    // Форматування часу з підтрикою моноширинних цифр через клас у батька
-    const formatTime = (totalSeconds) => {
-      const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
-      const m = Math.floor(safeSeconds / 60);
-      const s = safeSeconds % 60;
-      return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-    };
-
-    const sortDoneFirst = (taskList) => [
-      ...taskList.filter(task => task.done),
-      ...taskList.filter(task => !task.done)
-    ];
-
-    const buildTelegramTextFromTasks = (tasks) => tasks
-      .map((task, index) => `${task.done ? "✅ " : ""}${index + 1}. ${(task.text || "").trim() || "..."}`)
-      .join(TELEGRAM_SEPARATOR);
-
-    // Звуковий сигнал (залишено без змін логіки)
-    const playSoftChime = () => {
-      try {
+  <script>
+/** @jsxRuntime classic */
+/** @jsx React.createElement */
+const { useState, useEffect, useRef } = React;
+const TELEGRAM_SEPARATOR = "\n\n";
+// Компонент Іконки з покращеним вирівнюванням
+const Icon = ({ name, filled = false, size = 24, className = "" }) => (React.createElement("span", { className: `material-symbols-rounded ${filled ? "filled" : ""} ${className}`, style: { fontSize: size, width: size, height: size }, "aria-hidden": "true" }, name));
+const uid = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+// Форматування часу з підтрикою моноширинних цифр через клас у батька
+const formatTime = (totalSeconds) => {
+    const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+    const m = Math.floor(safeSeconds / 60);
+    const s = safeSeconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+};
+const sortDoneFirst = (taskList) => [
+    ...taskList.filter(task => task.done),
+    ...taskList.filter(task => !task.done)
+];
+const buildTelegramTextFromTasks = (tasks) => tasks
+    .map((task, index) => `${task.done ? "✅ " : ""}${index + 1}. ${(task.text || "").trim() || "..."}`)
+    .join(TELEGRAM_SEPARATOR);
+// Звуковий сигнал (залишено без змін логіки)
+const playSoftChime = () => {
+    try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
@@ -172,1016 +182,742 @@
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.7);
         oscillator.start(audioCtx.currentTime);
         oscillator.stop(audioCtx.currentTime + 2);
-      } catch (e) {}
-    };
-
-    // Розрахунок часу для завдань (логіка без змін)
-    const calculateTaskTimes = (tasks, totalMinutes, mode) => {
-      const normalizedTasks = tasks.filter(t => (t.title || "").trim());
-      if (normalizedTasks.length === 0) return [];
-      const safeMinutes = Math.max(1, Number(totalMinutes) || 1);
-      const totalSeconds = safeMinutes * 60;
-
-      if (mode === "even") {
+    }
+    catch (e) { }
+};
+// Розрахунок часу для завдань (логіка без змін)
+const calculateTaskTimes = (tasks, totalMinutes, mode) => {
+    const normalizedTasks = tasks.filter(t => (t.title || "").trim());
+    if (normalizedTasks.length === 0)
+        return [];
+    const safeMinutes = Math.max(1, Number(totalMinutes) || 1);
+    const totalSeconds = safeMinutes * 60;
+    if (mode === "even") {
         const base = Math.floor(totalSeconds / normalizedTasks.length);
         let remainder = totalSeconds - base * normalizedTasks.length;
         return normalizedTasks.map(t => {
-          const extra = remainder > 0 ? 1 : 0;
-          remainder -= extra;
-          return { ...t, assignedSeconds: base + extra };
+            const extra = remainder > 0 ? 1 : 0;
+            remainder -= extra;
+            return { ...t, assignedSeconds: base + extra };
         });
-      }
-
-      const weightMap = { low: 1, medium: 2, high: 3 };
-      const totalWeight = normalizedTasks.reduce((sum, t) => sum + (weightMap[t.priority] || 2), 0);
-      let usedSeconds = 0;
-
-      return normalizedTasks.map((t, index) => {
+    }
+    const weightMap = { low: 1, medium: 2, high: 3 };
+    const totalWeight = normalizedTasks.reduce((sum, t) => sum + (weightMap[t.priority] || 2), 0);
+    let usedSeconds = 0;
+    return normalizedTasks.map((t, index) => {
         const isLast = index === normalizedTasks.length - 1;
         const seconds = isLast
-          ? totalSeconds - usedSeconds
-          : Math.floor(totalSeconds * ((weightMap[t.priority] || 2) / totalWeight));
+            ? totalSeconds - usedSeconds
+            : Math.floor(totalSeconds * ((weightMap[t.priority] || 2) / totalWeight));
         usedSeconds += seconds;
         return { ...t, assignedSeconds: Math.max(1, seconds) };
-      });
-    };
-
-    const getInitialDailyTasks = () => Array.from({ length: 10 }, () => ({ id: uid(), text: "", done: false }));
-
-    // Кастомний хук для LocalStorage (логіка без змін)
-    function useStoredState(key, initialValue) {
-      const [value, setValue] = useState(() => {
+    });
+};
+const getInitialDailyTasks = () => Array.from({ length: 10 }, () => ({ id: uid(), text: "", done: false }));
+// Кастомний хук для LocalStorage (логіка без змін)
+function useStoredState(key, initialValue) {
+    const [value, setValue] = useState(() => {
         try {
-          const saved = localStorage.getItem(key);
-          return saved ? JSON.parse(saved) : initialValue;
-        } catch {
-          return initialValue;
+            const saved = localStorage.getItem(key);
+            return saved ? JSON.parse(saved) : initialValue;
         }
-      });
-
-      useEffect(() => {
-        try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
-      }, [key, value]);
-
-      return [value, setValue];
-    }
-
-    function App() {
-      const [section, setSection] = useState("plan");
-      const [focusView, setFocusView] = useState("dashboard");
-      const [history, setHistory] = useStoredState("focusHistoryV2", []);
-      const [soundEnabled, setSoundEnabled] = useStoredState("soundEnabledV1", true);
-      const [blockConfig, setBlockConfig] = useStoredState("focusBlockDraftV2", {
+        catch (_a) {
+            return initialValue;
+        }
+    });
+    useEffect(() => {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+        catch (_a) { }
+    }, [key, value]);
+    return [value, setValue];
+}
+function App() {
+    const [section, setSection] = useState("plan");
+    const [focusView, setFocusView] = useState("dashboard");
+    const [history, setHistory] = useStoredState("focusHistoryV2", []);
+    const [soundEnabled, setSoundEnabled] = useStoredState("soundEnabledV1", true);
+    const [blockConfig, setBlockConfig] = useStoredState("focusBlockDraftV2", {
         title: "Фокус-блок",
         workDuration: 60,
         breakDuration: 10,
         distributionMode: "even",
         tasks: []
-      });
-      const [activeSession, setActiveSession] = useState(null);
-
-      const openFocusCreate = () => {
+    });
+    const [activeSession, setActiveSession] = useState(null);
+    const openFocusCreate = () => {
         setSection("focus");
         setFocusView("create");
-      };
-
-      const renderFocusView = () => {
+    };
+    const renderFocusView = () => {
+        var _a;
         switch (focusView) {
-          case "dashboard":
-            return <DashboardView goToCreate={() => setFocusView("create")} goToHistory={() => setFocusView("history")} history={history} />;
-          case "create":
-            return <CreateBlockView config={blockConfig} setConfig={setBlockConfig} goBack={() => setFocusView("dashboard")} startBlock={(sessionData) => { setActiveSession(sessionData); setFocusView("active"); if (soundEnabled) playSoftChime(); }} />;
-          case "active":
-            return <ActiveBlockView session={activeSession} updateSession={setActiveSession} soundEnabled={soundEnabled} finishBlock={(result) => { setHistory([{ ...result, date: new Date().toISOString() }, ...history]); setActiveSession(null); setFocusView("summary"); }} abortBlock={() => { setActiveSession(null); setFocusView("dashboard"); }} />;
-          case "summary":
-            return <SummaryView session={history[0]} startBreak={() => setFocusView("break")} goHome={() => setFocusView("dashboard")} />;
-          case "break":
-            return <BreakView duration={history[0]?.breakDuration || 10} finishBreak={() => setFocusView("dashboard")} soundEnabled={soundEnabled} />;
-          case "history":
-            return <HistoryView history={history} goBack={() => setFocusView("dashboard")} />;
-          default:
-            return <DashboardView goToCreate={() => setFocusView("create")} goToHistory={() => setFocusView("history")} history={history} />;
+            case "dashboard":
+                return React.createElement(DashboardView, { goToCreate: () => setFocusView("create"), goToHistory: () => setFocusView("history"), history: history });
+            case "create":
+                return React.createElement(CreateBlockView, { config: blockConfig, setConfig: setBlockConfig, goBack: () => setFocusView("dashboard"), startBlock: (sessionData) => { setActiveSession(sessionData); setFocusView("active"); if (soundEnabled)
+                        playSoftChime(); } });
+            case "active":
+                return React.createElement(ActiveBlockView, { session: activeSession, updateSession: setActiveSession, soundEnabled: soundEnabled, finishBlock: (result) => { setHistory([{ ...result, date: new Date().toISOString() }, ...history]); setActiveSession(null); setFocusView("summary"); }, abortBlock: () => { setActiveSession(null); setFocusView("dashboard"); } });
+            case "summary":
+                return React.createElement(SummaryView, { session: history[0], startBreak: () => setFocusView("break"), goHome: () => setFocusView("dashboard") });
+            case "break":
+                return React.createElement(BreakView, { duration: ((_a = history[0]) === null || _a === void 0 ? void 0 : _a.breakDuration) || 10, finishBreak: () => setFocusView("dashboard"), soundEnabled: soundEnabled });
+            case "history":
+                return React.createElement(HistoryView, { history: history, goBack: () => setFocusView("dashboard") });
+            default:
+                return React.createElement(DashboardView, { goToCreate: () => setFocusView("create"), goToHistory: () => setFocusView("history"), history: history });
         }
-      };
-
-      const isFullTimer = section === "focus" && (focusView === "active" || focusView === "break");
-
-      return (
-        <div className="min-h-screen text-stone-800 font-sans flex flex-col">
-          {!isFullTimer && (
-            <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-100/50">
-              <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div
-                    className="text-xl font-semibold tracking-tight flex items-center gap-2.5 cursor-pointer text-stone-800 hover:opacity-80 transition-opacity"
-                    onClick={() => { setSection("plan"); setFocusView("dashboard"); }}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-sm flex items-center justify-center shrink-0">
-                      <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
-                    </div>
-                    Простір
-                  </div>
-                  <div className="flex gap-2 sm:hidden">
-                    <TopIconButton onClick={() => setSoundEnabled(!soundEnabled)} icon={soundEnabled ? "volume_up" : "volume_off"} active={soundEnabled} />
-                    <TopIconButton onClick={() => { setSection("focus"); setFocusView("history"); }} icon="history" />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
-                  <TabButton active={section === "plan"} onClick={() => setSection("plan")} icon="view_list" label="План на день" />
-                  <TabButton active={section === "focus"} onClick={() => { setSection("focus"); setFocusView("dashboard"); }} icon="timer" label="Фокус-блок" />
-                  <div className="hidden sm:flex gap-2 ml-4 pl-4 border-l border-stone-200">
-                    <TopIconButton onClick={() => setSoundEnabled(!soundEnabled)} icon={soundEnabled ? "volume_up" : "volume_off"} active={soundEnabled} title="Звук" />
-                  </div>
-                </div>
-              </div>
-            </nav>
-          )}
-
-          <main className={`flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 safe-bottom ${isFullTimer ? "pt-4" : "pt-8 sm:pt-10"}`}>
-            {section === "plan" ? <DailyPlanView openFocusCreate={openFocusCreate} /> : renderFocusView()}
-          </main>
-        </div>
-      );
-    }
-
-    // Оновлені компоненти навігації
-    function TopIconButton({ onClick, icon, active, title }) {
-      return (
-        <button 
-          onClick={onClick} 
-          title={title}
-          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-200
+    };
+    const isFullTimer = section === "focus" && (focusView === "active" || focusView === "break");
+    return (React.createElement("div", { className: "min-h-screen text-stone-800 font-sans flex flex-col" },
+        !isFullTimer && (React.createElement("nav", { className: "sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-100/50" },
+            React.createElement("div", { className: "max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4" },
+                React.createElement("div", { className: "flex items-center justify-between gap-3" },
+                    React.createElement("div", { className: "text-xl font-semibold tracking-tight flex items-center gap-2.5 cursor-pointer text-stone-800 hover:opacity-80 transition-opacity", onClick: () => { setSection("plan"); setFocusView("dashboard"); } },
+                        React.createElement("div", { className: "w-8 h-8 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-sm flex items-center justify-center shrink-0" },
+                            React.createElement("div", { className: "w-2.5 h-2.5 bg-white rounded-full" })),
+                        "\u041F\u0440\u043E\u0441\u0442\u0456\u0440"),
+                    React.createElement("div", { className: "flex gap-2 sm:hidden" },
+                        React.createElement(TopIconButton, { onClick: () => setSoundEnabled(!soundEnabled), icon: soundEnabled ? "volume_up" : "volume_off", active: soundEnabled }),
+                        React.createElement(TopIconButton, { onClick: () => { setSection("focus"); setFocusView("history"); }, icon: "history" }))),
+                React.createElement("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide" },
+                    React.createElement(TabButton, { active: section === "plan", onClick: () => setSection("plan"), icon: "view_list", label: "\u041F\u043B\u0430\u043D \u043D\u0430 \u0434\u0435\u043D\u044C" }),
+                    React.createElement(TabButton, { active: section === "focus", onClick: () => { setSection("focus"); setFocusView("dashboard"); }, icon: "timer", label: "\u0424\u043E\u043A\u0443\u0441-\u0431\u043B\u043E\u043A" }),
+                    React.createElement("div", { className: "hidden sm:flex gap-2 ml-4 pl-4 border-l border-stone-200" },
+                        React.createElement(TopIconButton, { onClick: () => setSoundEnabled(!soundEnabled), icon: soundEnabled ? "volume_up" : "volume_off", active: soundEnabled, title: "\u0417\u0432\u0443\u043A" })))))),
+        React.createElement("main", { className: `flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 safe-bottom ${isFullTimer ? "pt-4" : "pt-8 sm:pt-10"}` }, section === "plan" ? React.createElement(DailyPlanView, { openFocusCreate: openFocusCreate }) : renderFocusView())));
+}
+// Оновлені компоненти навігації
+function TopIconButton({ onClick, icon, active, title }) {
+    return (React.createElement("button", { onClick: onClick, title: title, className: `w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-200
             ${active === false ? "bg-stone-100 text-stone-400 hover:bg-stone-200" : "bg-white border border-stone-200 text-stone-500 hover:text-brand-600 hover:border-brand-200 hover:bg-brand-50 shadow-sm"}
-          `}
-        >
-          <Icon name={icon} size={20} />
-        </button>
-      );
-    }
-
-    function TabButton({ active, onClick, icon, label }) {
-      return (
-        <button
-          onClick={onClick}
-          className={`h-10 sm:h-11 px-4 sm:px-5 rounded-full text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap shrink-0
-            ${active 
-              ? "bg-stone-800 text-white shadow-md hover:bg-stone-900" 
-              : "bg-transparent text-stone-500 hover:bg-stone-100 hover:text-stone-800"
-            }`}
-        >
-          <Icon name={icon} size={18} filled={active} />
-          {label}
-        </button>
-      );
-    }
-
-    function DailyPlanView({ openFocusCreate }) {
-      const [tasks, setTasks] = useStoredState("dailyPlanTasksV2", getInitialDailyTasks());
-      const [draggedIndex, setDraggedIndex] = useState(null);
-      const [toast, setToast] = useState("");
-
-      useEffect(() => {
-        if (!Array.isArray(tasks) || tasks.length !== 10) setTasks(getInitialDailyTasks());
-      }, []);
-
-      const doneCount = tasks.filter(t => t.done).length;
-
-      const showToast = (message) => {
+          ` },
+        React.createElement(Icon, { name: icon, size: 20 })));
+}
+function TabButton({ active, onClick, icon, label }) {
+    return (React.createElement("button", { onClick: onClick, className: `h-10 sm:h-11 px-4 sm:px-5 rounded-full text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap shrink-0
+            ${active
+            ? "bg-stone-800 text-white shadow-md hover:bg-stone-900"
+            : "bg-transparent text-stone-500 hover:bg-stone-100 hover:text-stone-800"}` },
+        React.createElement(Icon, { name: icon, size: 18, filled: active }),
+        label));
+}
+function DailyPlanView({ openFocusCreate }) {
+    const [tasks, setTasks] = useStoredState("dailyPlanTasksV2", getInitialDailyTasks());
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const [toast, setToast] = useState("");
+    useEffect(() => {
+        if (!Array.isArray(tasks) || tasks.length !== 10)
+            setTasks(getInitialDailyTasks());
+    }, []);
+    const doneCount = tasks.filter(t => t.done).length;
+    const showToast = (message) => {
         setToast(message);
         window.clearTimeout(showToast.timer);
         showToast.timer = window.setTimeout(() => setToast(""), 2000);
-      };
-
-      const updateTask = (index, patch) => {
+    };
+    const updateTask = (index, patch) => {
         const nextTasks = tasks.map((task, i) => i === index ? { ...task, ...patch } : task);
         setTasks(Object.prototype.hasOwnProperty.call(patch, "done") ? sortDoneFirst(nextTasks) : nextTasks);
-      };
-
-      const moveDoneTasksUp = () => {
+    };
+    const moveDoneTasksUp = () => {
         setTasks(sortDoneFirst(tasks));
         showToast("Готові задачі піднято");
-      };
-
-      const resetTasks = () => {
-        if(confirm("Очистити весь список задач?")) {
-           setTasks(getInitialDailyTasks());
-           showToast("План очищено");
+    };
+    const resetTasks = () => {
+        if (confirm("Очистити весь список задач?")) {
+            setTasks(getInitialDailyTasks());
+            showToast("План очищено");
         }
-      };
-
-      const reorderTasks = (fromIndex, toIndex) => {
-        if (fromIndex === null || fromIndex === toIndex) return;
+    };
+    const reorderTasks = (fromIndex, toIndex) => {
+        if (fromIndex === null || fromIndex < 0 || toIndex < 0 || fromIndex === toIndex)
+            return;
         const next = [...tasks];
         const [moved] = next.splice(fromIndex, 1);
         next.splice(toIndex, 0, moved);
         setTasks(next);
-      };
-
-      const copyForTelegram = async () => {
+    };
+    const reorderTasksById = (draggedId, targetId) => {
+        const fromIndex = tasks.findIndex(t => t.id === draggedId);
+        const toIndex = tasks.findIndex(t => t.id === targetId);
+        reorderTasks(fromIndex, toIndex);
+    };
+    const copyForTelegram = async () => {
         const text = buildTelegramTextFromTasks(tasks);
         try {
-          await navigator.clipboard.writeText(text);
-          showToast("Скопійовано для Telegram");
-        } catch {
-          const textarea = document.createElement("textarea");
-          textarea.value = text;
-          document.body.appendChild(textarea);
-          textarea.select();
-          document.execCommand("copy");
-          document.body.removeChild(textarea);
-          showToast("Скопійовано для Telegram");
+            await navigator.clipboard.writeText(text);
+            showToast("Скопійовано для Telegram");
         }
-      };
-
-      return (
-        <div className="slide-up max-w-5xl mx-auto pb-12">
-          <header className="mb-8 sm:mb-10 text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-800 mb-3">Ваш план на день</h1>
-            <p className="text-stone-500 max-w-2xl mx-auto sm:mx-0 text-sm sm:text-base">
-              Запишіть до 10 головних завдань. Змінюйте порядок, позначайте виконане та діліться звітом у Telegram.
-            </p>
-          </header>
-
-          <div className="grid lg:grid-cols-[1fr_300px] gap-6 sm:gap-8 relative">
-            {/* Ліва колонка: Список задач */}
-            <section className="bg-white rounded-3xl p-2 sm:p-4 shadow-soft border border-stone-100/50">
-              <div className="flex items-center justify-between px-4 pt-4 pb-2 mb-2">
-                <h2 className="text-sm font-semibold text-stone-400 uppercase tracking-widest">Список задач</h2>
-                <span className="text-sm font-medium px-3 py-1 bg-brand-50 text-brand-700 rounded-full">
-                  {doneCount} / 10
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                {tasks.map((task, index) => (
-                  <div
-                    key={task.id}
-                    draggable
-                    onDragStart={(e) => {
-                      setDraggedIndex(index);
-                      // Невеликий хак для візуалу під час drag
-                      setTimeout(() => e.target.classList.add('opacity-0'), 0);
-                    }}
-                    onDragEnd={(e) => {
-                      setDraggedIndex(null);
-                      e.target.classList.remove('opacity-0');
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      // Візуальний фідбек при наведенні (спрощено для продуктивності)
-                    }}
-                    onDrop={(e) => { 
-                      e.preventDefault(); 
-                      reorderTasks(draggedIndex, index); 
-                    }}
-                    className={`group relative flex items-center gap-3 p-3 sm:p-4 rounded-2xl transition-all duration-200
-                      ${draggedIndex === index 
-                        ? "bg-brand-50/50 border-2 border-dashed border-brand-300 z-10" 
+        catch (_a) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            showToast("Скопійовано для Telegram");
+        }
+    };
+    return (React.createElement("div", { className: "slide-up max-w-5xl mx-auto pb-12" },
+        React.createElement("header", { className: "mb-8 sm:mb-10 text-center sm:text-left" },
+            React.createElement("h1", { className: "text-3xl sm:text-4xl font-bold tracking-tight text-stone-800 mb-3" }, "\u0412\u0430\u0448 \u043F\u043B\u0430\u043D \u043D\u0430 \u0434\u0435\u043D\u044C"),
+            React.createElement("p", { className: "text-stone-500 max-w-2xl mx-auto sm:mx-0 text-sm sm:text-base" }, "\u0417\u0430\u043F\u0438\u0448\u0456\u0442\u044C \u0434\u043E 10 \u0433\u043E\u043B\u043E\u0432\u043D\u0438\u0445 \u0437\u0430\u0432\u0434\u0430\u043D\u044C. \u0417\u043C\u0456\u043D\u044E\u0439\u0442\u0435 \u043F\u043E\u0440\u044F\u0434\u043E\u043A, \u043F\u043E\u0437\u043D\u0430\u0447\u0430\u0439\u0442\u0435 \u0432\u0438\u043A\u043E\u043D\u0430\u043D\u0435 \u0442\u0430 \u0434\u0456\u043B\u0456\u0442\u044C\u0441\u044F \u0437\u0432\u0456\u0442\u043E\u043C \u0443 Telegram.")),
+        React.createElement("div", { className: "grid lg:grid-cols-[1fr_300px] gap-6 sm:gap-8 relative" },
+            React.createElement("section", { className: "bg-white rounded-3xl p-2 sm:p-4 shadow-soft border border-stone-100/50" },
+                React.createElement("div", { className: "flex items-center justify-between px-4 pt-4 pb-2 mb-2" },
+                    React.createElement("h2", { className: "text-sm font-semibold text-stone-400 uppercase tracking-widest" }, "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u0434\u0430\u0447"),
+                    React.createElement("span", { className: "text-sm font-medium px-3 py-1 bg-brand-50 text-brand-700 rounded-full" },
+                        doneCount,
+                        " / 10")),
+                React.createElement("div", { className: "space-y-1" }, tasks.map((task, index) => (React.createElement("div", { key: task.id, draggable: true, onDragStart: (e) => {
+                        if (e.target.tagName === "INPUT" || e.target.closest("button")) {
+                            e.preventDefault();
+                            return;
+                        }
+                        setDraggedIndex(index);
+                        e.dataTransfer.effectAllowed = "move";
+                        e.dataTransfer.setData("text/plain", task.id);
+                        // currentTarget — це саме рядок задачі. Так перетягування не ламається, якщо тягнути за іконку всередині.
+                        setTimeout(() => e.currentTarget.classList.add('opacity-0'), 0);
+                    }, onDragEnd: (e) => {
+                        setDraggedIndex(null);
+                        e.currentTarget.classList.remove('opacity-0');
+                    }, onDragOver: (e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = "move";
+                    }, onDrop: (e) => {
+                        e.preventDefault();
+                        const draggedId = e.dataTransfer.getData("text/plain");
+                        if (draggedId)
+                            reorderTasksById(draggedId, task.id);
+                        else
+                            reorderTasks(draggedIndex, index);
+                    }, className: `group relative flex items-center gap-3 p-3 sm:p-4 rounded-2xl transition-all duration-200
+                      ${draggedIndex === index
+                        ? "bg-brand-50/50 border-2 border-dashed border-brand-300 z-10"
                         : "bg-transparent hover:bg-stone-50 border-2 border-transparent"}
                       ${task.done && draggedIndex !== index ? "opacity-60" : "opacity-100"}
-                    `}
-                  >
-                    {/* Кнопка Drag */}
-                    <div className="cursor-grab active:cursor-grabbing text-stone-300 group-hover:text-stone-400 transition-colors p-1 -ml-2">
-                      <Icon name="drag_indicator" size={20} />
-                    </div>
-                    
-                    {/* Номер */}
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors
+                    ` },
+                    React.createElement("div", { className: "cursor-grab active:cursor-grabbing text-stone-300 group-hover:text-stone-400 transition-colors p-1 -ml-2" },
+                        React.createElement(Icon, { name: "drag_indicator", size: 20 })),
+                    React.createElement("div", { className: `w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors
                       ${task.done ? "bg-brand-100 text-brand-700" : "bg-stone-100 text-stone-400"}
-                    `}>
-                      {index + 1}
-                    </div>
-
-                    {/* Поле вводу */}
-                    <input
-                      type="text"
-                      value={task.text}
-                      onChange={(e) => updateTask(index, { text: e.target.value })}
-                      placeholder="Введіть задачу..."
-                      className={`flex-grow min-w-0 bg-transparent outline-none text-base sm:text-lg transition-all
-                        ${task.done 
-                          ? "text-stone-400 line-through decoration-brand-400/50 decoration-2" 
-                          : "text-stone-800 placeholder:text-stone-300 focus:text-brand-900"}
-                      `}
-                    />
-
-                    {/* Чекбокс */}
-                    <button
-                      onClick={() => updateTask(index, { done: !task.done })}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300
-                        ${task.done 
-                          ? "bg-brand-500 text-white shadow-md shadow-brand-500/30 scale-100" 
-                          : "bg-white border-2 border-stone-200 text-transparent hover:border-brand-400 hover:bg-brand-50 scale-95 hover:scale-100"}
-                      `}
-                      title={task.done ? "Скасувати" : "Виконано"}
-                    >
-                      <Icon name="check" size={18} className={task.done ? "opacity-100" : "opacity-0 text-brand-400"} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Права колонка: Інструменти */}
-            <aside className="space-y-4">
-              {/* Прогрес */}
-              <div className="bg-white rounded-3xl p-6 shadow-soft border border-stone-100/50">
-                <div className="flex justify-between items-end mb-4">
-                  <div>
-                    <div className="text-4xl font-bold tracking-tight text-stone-800">{Math.round((doneCount/10)*100)}%</div>
-                    <div className="text-sm font-medium text-stone-500 mt-1">Прогрес дня</div>
-                  </div>
-                  <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-brand-600">
-                    <Icon name="trending_up" size={24} />
-                  </div>
-                </div>
-                <div className="h-2.5 w-full bg-stone-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-brand-500 rounded-full transition-all duration-700 ease-out" 
-                    style={{ width: `${doneCount * 10}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Дії */}
-              <div className="bg-white rounded-3xl p-4 shadow-soft border border-stone-100/50 flex flex-col gap-2">
-                <button 
-                  onClick={copyForTelegram} 
-                  className="w-full py-3.5 px-4 bg-stone-800 text-white rounded-2xl font-medium hover:bg-stone-900 flex items-center justify-center gap-2 shadow-md shadow-stone-800/10"
-                >
-                  <Icon name="send" size={18} />
-                  Копіювати звіт
-                </button>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  <button 
-                    onClick={moveDoneTasksUp} 
-                    className="py-3 px-2 bg-stone-50 text-stone-600 rounded-xl font-medium hover:bg-stone-100 flex items-center justify-center gap-1.5 text-sm"
-                    title="Підняти виконані вгору"
-                  >
-                    <Icon name="sort" size={18} />
-                    Сортувати
-                  </button>
-                  <button 
-                    onClick={resetTasks} 
-                    className="py-3 px-2 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 flex items-center justify-center gap-1.5 text-sm"
-                  >
-                    <Icon name="delete_sweep" size={18} />
-                    Очистити
-                  </button>
-                </div>
-              </div>
-
-              {/* Промо Фокус-блоку */}
-              <div className="bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-3xl p-6 shadow-float relative overflow-hidden group cursor-pointer" onClick={openFocusCreate}>
-                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 border border-white/20">
-                  <Icon name="timer" size={22} />
-                </div>
-                <h3 className="font-semibold text-lg mb-1">Фокус-блок</h3>
-                <p className="text-brand-100 text-sm mb-5 leading-relaxed">
-                  Створіть таймер для глибокої роботи над важливими задачами.
-                </p>
-                <div className="inline-flex items-center gap-1 text-sm font-medium text-white group-hover:gap-2 transition-all">
-                  Створити сесію <Icon name="arrow_forward" size={16} />
-                </div>
-              </div>
-            </aside>
-          </div>
-
-          {/* Toast Notification */}
-          <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-stone-800 text-white shadow-xl shadow-stone-800/20 text-sm font-medium z-50 flex items-center gap-2 transition-all duration-300 ${toast ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"}`}>
-            <Icon name="check_circle" size={18} className="text-brand-400" />
-            {toast}
-          </div>
-        </div>
-      );
-    }
-
-    function DashboardView({ goToCreate, goToHistory, history }) {
-      const today = new Date().toDateString();
-      const todayBlocks = history.filter(b => new Date(b.date).toDateString() === today);
-      const totalMinutesToday = todayBlocks.reduce((acc, curr) => acc + (curr.totalWorkedMinutes || 0), 0);
-
-      return (
-        <div className="slide-up max-w-4xl mx-auto pb-12">
-          <header className="mb-8 sm:mb-12 text-center">
-            <div className="w-16 h-16 mx-auto bg-brand-100 text-brand-600 rounded-3xl flex items-center justify-center mb-4 shadow-sm border border-brand-200/50">
-              <Icon name="timelapse" size={32} />
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-800 mb-3">Глибокий Фокус</h1>
-            <p className="text-stone-500 max-w-lg mx-auto">
-              Метод інтервальної роботи для максимальної продуктивності.
-            </p>
-          </header>
-
-          <div className="grid sm:grid-cols-2 gap-5 mb-10">
-            {/* Створити блок */}
-            <div 
-              onClick={goToCreate}
-              className="group bg-white p-6 sm:p-8 rounded-[2rem] shadow-soft border border-stone-100 hover:shadow-float hover:border-brand-200 transition-all cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="w-12 h-12 bg-stone-50 group-hover:bg-brand-50 text-stone-600 group-hover:text-brand-600 rounded-2xl flex items-center justify-center mb-5 transition-colors">
-                  <Icon name="add" size={28} />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-stone-800">Нова сесія</h3>
-                <p className="text-stone-500 text-sm leading-relaxed mb-6">
-                  Сплануйте час, додайте задачі та розподіліть хвилини для максимальної концентрації.
-                </p>
-              </div>
-              <button className="w-full py-3.5 bg-brand-50 text-brand-700 group-hover:bg-brand-500 group-hover:text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
-                Почати налаштування <Icon name="arrow_right_alt" size={20} />
-              </button>
-            </div>
-
-            {/* Статистика */}
-            <div className="bg-stone-900 text-white p-6 sm:p-8 rounded-[2rem] shadow-xl shadow-stone-900/10 flex flex-col justify-between relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-stone-800 rounded-full blur-3xl -mr-20 -mt-20"></div>
-              <div className="relative z-10 flex justify-between items-start mb-6">
-                <div className="w-12 h-12 bg-stone-800 text-stone-300 rounded-2xl flex items-center justify-center">
-                  <Icon name="insights" size={24} />
-                </div>
-                <span className="px-3 py-1 bg-stone-800 rounded-full text-xs font-medium text-stone-300 tracking-wider">СЬОГОДНІ</span>
-              </div>
-              <div className="relative z-10 grid grid-cols-2 gap-6">
-                <div>
-                  <div className="text-4xl font-bold tracking-tighter mb-1">{Math.round(totalMinutesToday)}</div>
-                  <div className="text-sm text-stone-400 font-medium">Хвилин у фокусі</div>
-                </div>
-                <div>
-                  <div className="text-4xl font-bold tracking-tighter mb-1">{todayBlocks.length}</div>
-                  <div className="text-sm text-stone-400 font-medium">Завершено блоків</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Історія міні */}
-          {history.length > 0 && (
-            <div className="bg-white rounded-[2rem] p-6 shadow-soft border border-stone-100/50">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-stone-800 flex items-center gap-2">
-                  <Icon name="history" size={20} className="text-stone-400" />
-                  Останні сесії
-                </h3>
-                <button onClick={goToHistory} className="text-sm font-medium text-brand-600 hover:text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-colors">
-                  Дивитись всі
-                </button>
-              </div>
-              <div className="space-y-3">
-                {history.slice(0, 3).map((block, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 sm:p-4 rounded-2xl hover:bg-stone-50 border border-transparent hover:border-stone-100 transition-all group">
-                    <div className="flex items-center gap-4 min-w-0">
-                      <div className="w-10 h-10 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                         <Icon name="task_alt" size={20} />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-semibold text-stone-800 truncate">{block.title}</div>
-                        <div className="text-xs text-stone-500 mt-0.5">
-                          {new Date(block.date).toLocaleDateString("uk-UA", {month: 'long', day: 'numeric'})} • {block.completedTasks}/{block.totalTasks} задач
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <div className="font-semibold text-stone-700">{Math.round(block.totalWorkedMinutes)}</div>
-                      <div className="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Хвилин</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    function CreateBlockView({ config, setConfig, goBack, startBlock }) {
-      const [newTaskTitle, setNewTaskTitle] = useState("");
-      const [draggedIndex, setDraggedIndex] = useState(null);
-
-      const addTask = () => {
-        if (!newTaskTitle.trim()) return;
+                    ` }, index + 1),
+                    React.createElement("input", { type: "text", value: task.text, onChange: (e) => updateTask(index, { text: e.target.value }), placeholder: "\u0412\u0432\u0435\u0434\u0456\u0442\u044C \u0437\u0430\u0434\u0430\u0447\u0443...", className: `flex-grow min-w-0 bg-transparent outline-none text-base sm:text-lg transition-all
+                        ${task.done
+                            ? "text-stone-400 line-through decoration-brand-400/50 decoration-2"
+                            : "text-stone-800 placeholder:text-stone-300 focus:text-brand-900"}
+                      ` }),
+                    React.createElement("button", { onClick: () => updateTask(index, { done: !task.done }), className: `w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300
+                        ${task.done
+                            ? "bg-brand-500 text-white shadow-md shadow-brand-500/30 scale-100"
+                            : "bg-white border-2 border-stone-200 text-transparent hover:border-brand-400 hover:bg-brand-50 scale-95 hover:scale-100"}
+                      `, title: task.done ? "Скасувати" : "Виконано" },
+                        React.createElement(Icon, { name: "check", size: 18, className: task.done ? "opacity-100" : "opacity-0 text-brand-400" }))))))),
+            React.createElement("aside", { className: "space-y-4" },
+                React.createElement("div", { className: "bg-white rounded-3xl p-6 shadow-soft border border-stone-100/50" },
+                    React.createElement("div", { className: "flex justify-between items-end mb-4" },
+                        React.createElement("div", null,
+                            React.createElement("div", { className: "text-4xl font-bold tracking-tight text-stone-800" },
+                                Math.round((doneCount / 10) * 100),
+                                "%"),
+                            React.createElement("div", { className: "text-sm font-medium text-stone-500 mt-1" }, "\u041F\u0440\u043E\u0433\u0440\u0435\u0441 \u0434\u043D\u044F")),
+                        React.createElement("div", { className: "w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-brand-600" },
+                            React.createElement(Icon, { name: "trending_up", size: 24 }))),
+                    React.createElement("div", { className: "h-2.5 w-full bg-stone-100 rounded-full overflow-hidden" },
+                        React.createElement("div", { className: "h-full bg-brand-500 rounded-full transition-all duration-700 ease-out", style: { width: `${doneCount * 10}%` } }))),
+                React.createElement("div", { className: "bg-white rounded-3xl p-4 shadow-soft border border-stone-100/50 flex flex-col gap-2" },
+                    React.createElement("button", { onClick: copyForTelegram, className: "w-full py-3.5 px-4 bg-stone-800 text-white rounded-2xl font-medium hover:bg-stone-900 flex items-center justify-center gap-2 shadow-md shadow-stone-800/10" },
+                        React.createElement(Icon, { name: "send", size: 18 }),
+                        "\u041A\u043E\u043F\u0456\u044E\u0432\u0430\u0442\u0438 \u0437\u0432\u0456\u0442"),
+                    React.createElement("div", { className: "grid grid-cols-2 gap-2 mt-2" },
+                        React.createElement("button", { onClick: moveDoneTasksUp, className: "py-3 px-2 bg-stone-50 text-stone-600 rounded-xl font-medium hover:bg-stone-100 flex items-center justify-center gap-1.5 text-sm", title: "\u041F\u0456\u0434\u043D\u044F\u0442\u0438 \u0432\u0438\u043A\u043E\u043D\u0430\u043D\u0456 \u0432\u0433\u043E\u0440\u0443" },
+                            React.createElement(Icon, { name: "sort", size: 18 }),
+                            "\u0421\u043E\u0440\u0442\u0443\u0432\u0430\u0442\u0438"),
+                        React.createElement("button", { onClick: resetTasks, className: "py-3 px-2 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 flex items-center justify-center gap-1.5 text-sm" },
+                            React.createElement(Icon, { name: "delete_sweep", size: 18 }),
+                            "\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u0438"))),
+                React.createElement("div", { className: "bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-3xl p-6 shadow-float relative overflow-hidden group cursor-pointer", onClick: openFocusCreate },
+                    React.createElement("div", { className: "absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" }),
+                    React.createElement("div", { className: "w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 border border-white/20" },
+                        React.createElement(Icon, { name: "timer", size: 22 })),
+                    React.createElement("h3", { className: "font-semibold text-lg mb-1" }, "\u0424\u043E\u043A\u0443\u0441-\u0431\u043B\u043E\u043A"),
+                    React.createElement("p", { className: "text-brand-100 text-sm mb-5 leading-relaxed" }, "\u0421\u0442\u0432\u043E\u0440\u0456\u0442\u044C \u0442\u0430\u0439\u043C\u0435\u0440 \u0434\u043B\u044F \u0433\u043B\u0438\u0431\u043E\u043A\u043E\u0457 \u0440\u043E\u0431\u043E\u0442\u0438 \u043D\u0430\u0434 \u0432\u0430\u0436\u043B\u0438\u0432\u0438\u043C\u0438 \u0437\u0430\u0434\u0430\u0447\u0430\u043C\u0438."),
+                    React.createElement("div", { className: "inline-flex items-center gap-1 text-sm font-medium text-white group-hover:gap-2 transition-all" },
+                        "\u0421\u0442\u0432\u043E\u0440\u0438\u0442\u0438 \u0441\u0435\u0441\u0456\u044E ",
+                        React.createElement(Icon, { name: "arrow_forward", size: 16 }))))),
+        React.createElement("div", { className: `fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-stone-800 text-white shadow-xl shadow-stone-800/20 text-sm font-medium z-50 flex items-center gap-2 transition-all duration-300 ${toast ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"}` },
+            React.createElement(Icon, { name: "check_circle", size: 18, className: "text-brand-400" }),
+            toast)));
+}
+function DashboardView({ goToCreate, goToHistory, history }) {
+    const today = new Date().toDateString();
+    const todayBlocks = history.filter(b => new Date(b.date).toDateString() === today);
+    const totalMinutesToday = todayBlocks.reduce((acc, curr) => acc + (curr.totalWorkedMinutes || 0), 0);
+    return (React.createElement("div", { className: "slide-up max-w-4xl mx-auto pb-12" },
+        React.createElement("header", { className: "mb-8 sm:mb-12 text-center" },
+            React.createElement("div", { className: "w-16 h-16 mx-auto bg-brand-100 text-brand-600 rounded-3xl flex items-center justify-center mb-4 shadow-sm border border-brand-200/50" },
+                React.createElement(Icon, { name: "timelapse", size: 32 })),
+            React.createElement("h1", { className: "text-3xl sm:text-4xl font-bold tracking-tight text-stone-800 mb-3" }, "\u0413\u043B\u0438\u0431\u043E\u043A\u0438\u0439 \u0424\u043E\u043A\u0443\u0441"),
+            React.createElement("p", { className: "text-stone-500 max-w-lg mx-auto" }, "\u041C\u0435\u0442\u043E\u0434 \u0456\u043D\u0442\u0435\u0440\u0432\u0430\u043B\u044C\u043D\u043E\u0457 \u0440\u043E\u0431\u043E\u0442\u0438 \u0434\u043B\u044F \u043C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\u043E\u0457 \u043F\u0440\u043E\u0434\u0443\u043A\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u0456.")),
+        React.createElement("div", { className: "grid sm:grid-cols-2 gap-5 mb-10" },
+            React.createElement("div", { onClick: goToCreate, className: "group bg-white p-6 sm:p-8 rounded-[2rem] shadow-soft border border-stone-100 hover:shadow-float hover:border-brand-200 transition-all cursor-pointer flex flex-col justify-between" },
+                React.createElement("div", null,
+                    React.createElement("div", { className: "w-12 h-12 bg-stone-50 group-hover:bg-brand-50 text-stone-600 group-hover:text-brand-600 rounded-2xl flex items-center justify-center mb-5 transition-colors" },
+                        React.createElement(Icon, { name: "add", size: 28 })),
+                    React.createElement("h3", { className: "text-xl font-semibold mb-2 text-stone-800" }, "\u041D\u043E\u0432\u0430 \u0441\u0435\u0441\u0456\u044F"),
+                    React.createElement("p", { className: "text-stone-500 text-sm leading-relaxed mb-6" }, "\u0421\u043F\u043B\u0430\u043D\u0443\u0439\u0442\u0435 \u0447\u0430\u0441, \u0434\u043E\u0434\u0430\u0439\u0442\u0435 \u0437\u0430\u0434\u0430\u0447\u0456 \u0442\u0430 \u0440\u043E\u0437\u043F\u043E\u0434\u0456\u043B\u0456\u0442\u044C \u0445\u0432\u0438\u043B\u0438\u043D\u0438 \u0434\u043B\u044F \u043C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\u043E\u0457 \u043A\u043E\u043D\u0446\u0435\u043D\u0442\u0440\u0430\u0446\u0456\u0457.")),
+                React.createElement("button", { className: "w-full py-3.5 bg-brand-50 text-brand-700 group-hover:bg-brand-500 group-hover:text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2" },
+                    "\u041F\u043E\u0447\u0430\u0442\u0438 \u043D\u0430\u043B\u0430\u0448\u0442\u0443\u0432\u0430\u043D\u043D\u044F ",
+                    React.createElement(Icon, { name: "arrow_right_alt", size: 20 }))),
+            React.createElement("div", { className: "bg-stone-900 text-white p-6 sm:p-8 rounded-[2rem] shadow-xl shadow-stone-900/10 flex flex-col justify-between relative overflow-hidden" },
+                React.createElement("div", { className: "absolute top-0 right-0 w-64 h-64 bg-stone-800 rounded-full blur-3xl -mr-20 -mt-20" }),
+                React.createElement("div", { className: "relative z-10 flex justify-between items-start mb-6" },
+                    React.createElement("div", { className: "w-12 h-12 bg-stone-800 text-stone-300 rounded-2xl flex items-center justify-center" },
+                        React.createElement(Icon, { name: "insights", size: 24 })),
+                    React.createElement("span", { className: "px-3 py-1 bg-stone-800 rounded-full text-xs font-medium text-stone-300 tracking-wider" }, "\u0421\u042C\u041E\u0413\u041E\u0414\u041D\u0406")),
+                React.createElement("div", { className: "relative z-10 grid grid-cols-2 gap-6" },
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "text-4xl font-bold tracking-tighter mb-1" }, Math.round(totalMinutesToday)),
+                        React.createElement("div", { className: "text-sm text-stone-400 font-medium" }, "\u0425\u0432\u0438\u043B\u0438\u043D \u0443 \u0444\u043E\u043A\u0443\u0441\u0456")),
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "text-4xl font-bold tracking-tighter mb-1" }, todayBlocks.length),
+                        React.createElement("div", { className: "text-sm text-stone-400 font-medium" }, "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E \u0431\u043B\u043E\u043A\u0456\u0432"))))),
+        history.length > 0 && (React.createElement("div", { className: "bg-white rounded-[2rem] p-6 shadow-soft border border-stone-100/50" },
+            React.createElement("div", { className: "flex justify-between items-center mb-6" },
+                React.createElement("h3", { className: "text-lg font-semibold text-stone-800 flex items-center gap-2" },
+                    React.createElement(Icon, { name: "history", size: 20, className: "text-stone-400" }),
+                    "\u041E\u0441\u0442\u0430\u043D\u043D\u0456 \u0441\u0435\u0441\u0456\u0457"),
+                React.createElement("button", { onClick: goToHistory, className: "text-sm font-medium text-brand-600 hover:text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-colors" }, "\u0414\u0438\u0432\u0438\u0442\u0438\u0441\u044C \u0432\u0441\u0456")),
+            React.createElement("div", { className: "space-y-3" }, history.slice(0, 3).map((block, i) => (React.createElement("div", { key: i, className: "flex items-center justify-between p-3 sm:p-4 rounded-2xl hover:bg-stone-50 border border-transparent hover:border-stone-100 transition-all group" },
+                React.createElement("div", { className: "flex items-center gap-4 min-w-0" },
+                    React.createElement("div", { className: "w-10 h-10 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform" },
+                        React.createElement(Icon, { name: "task_alt", size: 20 })),
+                    React.createElement("div", { className: "min-w-0" },
+                        React.createElement("div", { className: "font-semibold text-stone-800 truncate" }, block.title),
+                        React.createElement("div", { className: "text-xs text-stone-500 mt-0.5" },
+                            new Date(block.date).toLocaleDateString("uk-UA", { month: 'long', day: 'numeric' }),
+                            " \u2022 ",
+                            block.completedTasks,
+                            "/",
+                            block.totalTasks,
+                            " \u0437\u0430\u0434\u0430\u0447"))),
+                React.createElement("div", { className: "text-right shrink-0" },
+                    React.createElement("div", { className: "font-semibold text-stone-700" }, Math.round(block.totalWorkedMinutes)),
+                    React.createElement("div", { className: "text-[10px] uppercase tracking-wider text-stone-400 font-medium" }, "\u0425\u0432\u0438\u043B\u0438\u043D"))))))))));
+}
+function CreateBlockView({ config, setConfig, goBack, startBlock }) {
+    const [newTaskTitle, setNewTaskTitle] = useState("");
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const addTask = () => {
+        if (!newTaskTitle.trim())
+            return;
         setConfig({ ...config, tasks: [...config.tasks, { id: uid(), title: newTaskTitle.trim(), priority: "medium", completed: false }] });
         setNewTaskTitle("");
-      };
-
-      const removeTask = (id) => setConfig({ ...config, tasks: config.tasks.filter(t => t.id !== id) });
-
-      const handleStart = () => {
+    };
+    const removeTask = (id) => setConfig({ ...config, tasks: config.tasks.filter(t => t.id !== id) });
+    const handleStart = () => {
         const tasksWithTime = calculateTaskTimes(config.tasks, config.workDuration, config.distributionMode);
         if (tasksWithTime.length === 0) {
-           alert("Додайте хоча б одну задачу для фокусу.");
-           return;
+            alert("Додайте хоча б одну задачу для фокусу.");
+            return;
         }
         startBlock({ ...config, tasks: tasksWithTime, startTime: Date.now() });
-      };
-
-      const handleDragEnter = (index) => {
-        if (draggedIndex === null || draggedIndex === index) return;
+    };
+    const reorderFocusTasks = (fromIndex, toIndex) => {
+        if (fromIndex === null || fromIndex < 0 || toIndex < 0 || fromIndex === toIndex)
+            return;
         const newTasks = [...config.tasks];
-        const [draggedItem] = newTasks.splice(draggedIndex, 1);
-        newTasks.splice(index, 0, draggedItem);
-        setDraggedIndex(index);
+        const [draggedItem] = newTasks.splice(fromIndex, 1);
+        newTasks.splice(toIndex, 0, draggedItem);
+        setDraggedIndex(toIndex);
         setConfig({ ...config, tasks: newTasks });
-      };
-
-      const previewTasks = calculateTaskTimes(config.tasks, config.workDuration, config.distributionMode);
-
-      return (
-        <div className="slide-up max-w-2xl mx-auto pb-24 sm:pb-12">
-          <button onClick={goBack} className="inline-flex items-center gap-1 text-sm font-medium text-stone-500 hover:text-stone-800 mb-6 transition-colors px-2 py-1 -ml-2 rounded-lg hover:bg-stone-100">
-            <Icon name="arrow_back" size={18} /> Назад
-          </button>
-
-          <div className="bg-white rounded-[2rem] p-5 sm:p-8 shadow-soft border border-stone-100 mb-6">
-            <input 
-              type="text" 
-              value={config.title} 
-              onChange={(e) => setConfig({ ...config, title: e.target.value })} 
-              className="text-2xl sm:text-3xl font-bold w-full border-none bg-transparent outline-none placeholder-stone-300 text-stone-800 mb-8 focus:ring-0 p-0 transition-colors" 
-              placeholder="Назва сесії (напр., Робота над проєктом)" 
-            />
-
-            <div className="grid grid-cols-2 gap-4 mb-10">
-              <div className="bg-stone-50 border border-stone-100 p-4 rounded-2xl relative group hover:border-brand-200 transition-colors">
-                <label className="text-xs font-bold text-stone-400 uppercase tracking-widest block mb-2">Фокус (хв)</label>
-                <div className="flex items-center gap-2">
-                  <Icon name="timer" size={24} className="text-stone-300 group-hover:text-brand-500 transition-colors" />
-                  <input type="number" value={config.workDuration} onChange={(e) => setConfig({ ...config, workDuration: Math.max(1, parseInt(e.target.value) || 1) })} className="text-3xl font-semibold bg-transparent border-none outline-none w-full p-0 text-stone-800" min="1" />
-                </div>
-              </div>
-              <div className="bg-stone-50 border border-stone-100 p-4 rounded-2xl relative group hover:border-blue-200 transition-colors">
-                <label className="text-xs font-bold text-stone-400 uppercase tracking-widest block mb-2">Перерва (хв)</label>
-                <div className="flex items-center gap-2">
-                  <Icon name="local_cafe" size={24} className="text-stone-300 group-hover:text-blue-500 transition-colors" />
-                  <input type="number" value={config.breakDuration} onChange={(e) => setConfig({ ...config, breakDuration: Math.max(0, parseInt(e.target.value) || 0) })} className="text-3xl font-semibold bg-transparent border-none outline-none w-full p-0 text-stone-800" min="0" />
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-                <h3 className="text-lg font-semibold text-stone-800">Задачі на сесію</h3>
-                <div className="flex bg-stone-100/80 p-1 rounded-xl w-fit border border-stone-200/50">
-                  <button 
-                    className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${config.distributionMode === "even" ? "bg-white shadow-sm text-stone-800" : "text-stone-500 hover:text-stone-700"}`} 
-                    onClick={() => setConfig({ ...config, distributionMode: "even" })}
-                  >
-                    Рівномірно
-                  </button>
-                  <button 
-                    className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${config.distributionMode === "priority" ? "bg-white shadow-sm text-stone-800" : "text-stone-500 hover:text-stone-700"}`} 
-                    onClick={() => setConfig({ ...config, distributionMode: "priority" })}
-                  >
-                    За пріоритетом
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2 mb-4">
-                {previewTasks.length === 0 && (
-                  <div className="text-center py-8 bg-stone-50 rounded-2xl border border-stone-100 border-dashed text-stone-400 text-sm">
-                    Додайте задачі нижче
-                  </div>
-                )}
-                
-                {previewTasks.map((task, idx) => (
-                  <div 
-                    key={task.id} 
-                    draggable 
-                    onDragStart={() => setDraggedIndex(idx)} 
-                    onDragEnter={() => handleDragEnter(idx)} 
-                    onDragEnd={() => setDraggedIndex(null)} 
-                    onDragOver={(e) => e.preventDefault()} 
-                    className={`group flex items-center gap-2 sm:gap-3 bg-white border p-2 sm:p-3 rounded-xl transition-all
+    };
+    const handleDragEnter = (index) => {
+        reorderFocusTasks(draggedIndex, index);
+    };
+    const previewTasks = calculateTaskTimes(config.tasks, config.workDuration, config.distributionMode);
+    return (React.createElement("div", { className: "slide-up max-w-2xl mx-auto pb-24 sm:pb-12" },
+        React.createElement("button", { onClick: goBack, className: "inline-flex items-center gap-1 text-sm font-medium text-stone-500 hover:text-stone-800 mb-6 transition-colors px-2 py-1 -ml-2 rounded-lg hover:bg-stone-100" },
+            React.createElement(Icon, { name: "arrow_back", size: 18 }),
+            " \u041D\u0430\u0437\u0430\u0434"),
+        React.createElement("div", { className: "bg-white rounded-[2rem] p-5 sm:p-8 shadow-soft border border-stone-100 mb-6" },
+            React.createElement("input", { type: "text", value: config.title, onChange: (e) => setConfig({ ...config, title: e.target.value }), className: "text-2xl sm:text-3xl font-bold w-full border-none bg-transparent outline-none placeholder-stone-300 text-stone-800 mb-8 focus:ring-0 p-0 transition-colors", placeholder: "\u041D\u0430\u0437\u0432\u0430 \u0441\u0435\u0441\u0456\u0457 (\u043D\u0430\u043F\u0440., \u0420\u043E\u0431\u043E\u0442\u0430 \u043D\u0430\u0434 \u043F\u0440\u043E\u0454\u043A\u0442\u043E\u043C)" }),
+            React.createElement("div", { className: "grid grid-cols-2 gap-4 mb-10" },
+                React.createElement("div", { className: "bg-stone-50 border border-stone-100 p-4 rounded-2xl relative group hover:border-brand-200 transition-colors" },
+                    React.createElement("label", { className: "text-xs font-bold text-stone-400 uppercase tracking-widest block mb-2" }, "\u0424\u043E\u043A\u0443\u0441 (\u0445\u0432)"),
+                    React.createElement("div", { className: "flex items-center gap-2" },
+                        React.createElement(Icon, { name: "timer", size: 24, className: "text-stone-300 group-hover:text-brand-500 transition-colors" }),
+                        React.createElement("input", { type: "number", value: config.workDuration, onChange: (e) => setConfig({ ...config, workDuration: Math.max(1, parseInt(e.target.value) || 1) }), className: "text-3xl font-semibold bg-transparent border-none outline-none w-full p-0 text-stone-800", min: "1" }))),
+                React.createElement("div", { className: "bg-stone-50 border border-stone-100 p-4 rounded-2xl relative group hover:border-blue-200 transition-colors" },
+                    React.createElement("label", { className: "text-xs font-bold text-stone-400 uppercase tracking-widest block mb-2" }, "\u041F\u0435\u0440\u0435\u0440\u0432\u0430 (\u0445\u0432)"),
+                    React.createElement("div", { className: "flex items-center gap-2" },
+                        React.createElement(Icon, { name: "local_cafe", size: 24, className: "text-stone-300 group-hover:text-blue-500 transition-colors" }),
+                        React.createElement("input", { type: "number", value: config.breakDuration, onChange: (e) => setConfig({ ...config, breakDuration: Math.max(0, parseInt(e.target.value) || 0) }), className: "text-3xl font-semibold bg-transparent border-none outline-none w-full p-0 text-stone-800", min: "0" })))),
+            React.createElement("div", { className: "mb-4" },
+                React.createElement("div", { className: "flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4" },
+                    React.createElement("h3", { className: "text-lg font-semibold text-stone-800" }, "\u0417\u0430\u0434\u0430\u0447\u0456 \u043D\u0430 \u0441\u0435\u0441\u0456\u044E"),
+                    React.createElement("div", { className: "flex bg-stone-100/80 p-1 rounded-xl w-fit border border-stone-200/50" },
+                        React.createElement("button", { className: `text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${config.distributionMode === "even" ? "bg-white shadow-sm text-stone-800" : "text-stone-500 hover:text-stone-700"}`, onClick: () => setConfig({ ...config, distributionMode: "even" }) }, "\u0420\u0456\u0432\u043D\u043E\u043C\u0456\u0440\u043D\u043E"),
+                        React.createElement("button", { className: `text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${config.distributionMode === "priority" ? "bg-white shadow-sm text-stone-800" : "text-stone-500 hover:text-stone-700"}`, onClick: () => setConfig({ ...config, distributionMode: "priority" }) }, "\u0417\u0430 \u043F\u0440\u0456\u043E\u0440\u0438\u0442\u0435\u0442\u043E\u043C"))),
+                React.createElement("div", { className: "space-y-2 mb-4" },
+                    previewTasks.length === 0 && (React.createElement("div", { className: "text-center py-8 bg-stone-50 rounded-2xl border border-stone-100 border-dashed text-stone-400 text-sm" }, "\u0414\u043E\u0434\u0430\u0439\u0442\u0435 \u0437\u0430\u0434\u0430\u0447\u0456 \u043D\u0438\u0436\u0447\u0435")),
+                    previewTasks.map((task, idx) => (React.createElement("div", { key: task.id, draggable: true, onDragStart: (e) => {
+                            setDraggedIndex(idx);
+                            e.dataTransfer.effectAllowed = "move";
+                            e.dataTransfer.setData("text/plain", task.id);
+                        }, onDragEnter: () => handleDragEnter(idx), onDragEnd: () => setDraggedIndex(null), onDragOver: (e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = "move";
+                        }, onDrop: (e) => e.preventDefault(), className: `group flex items-center gap-2 sm:gap-3 bg-white border p-2 sm:p-3 rounded-xl transition-all
                       ${draggedIndex === idx ? "opacity-40 border-brand-400 border-dashed bg-brand-50" : "border-stone-200 hover:border-stone-300 shadow-sm hover:shadow"}
-                    `}
-                  >
-                    <div className="cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 p-1">
-                      <Icon name="drag_indicator" size={20} />
-                    </div>
-                    <div className="w-6 h-6 shrink-0 rounded-full bg-stone-100 flex items-center justify-center text-xs font-semibold text-stone-500">{idx + 1}</div>
-                    
-                    <input 
-                      type="text" 
-                      value={task.title} 
-                      onChange={(e) => {
-                        const newTasks = [...config.tasks];
-                        const realIndex = config.tasks.findIndex(t => t.id === task.id);
-                        if (realIndex >= 0) newTasks[realIndex].title = e.target.value;
-                        setConfig({ ...config, tasks: newTasks });
-                      }} 
-                      className="flex-grow min-w-0 border-none outline-none bg-transparent text-sm sm:text-base text-stone-800 font-medium" 
-                    />
-                    
-                    {config.distributionMode === "priority" && (
-                      <select 
-                        value={task.priority} 
-                        onChange={(e) => {
-                          const newTasks = [...config.tasks];
-                          const realIndex = config.tasks.findIndex(t => t.id === task.id);
-                          if (realIndex >= 0) newTasks[realIndex].priority = e.target.value;
-                          setConfig({ ...config, tasks: newTasks });
-                        }} 
-                        className="text-xs font-medium bg-stone-100 border-none outline-none rounded-lg px-2 py-1.5 text-stone-600 cursor-pointer shrink-0 appearance-none text-center"
-                      >
-                        <option value="low">Низький</option>
-                        <option value="medium">Середній</option>
-                        <option value="high">Високий</option>
-                      </select>
-                    )}
-                    
-                    <div className="text-xs font-bold text-brand-700 bg-brand-50 px-2 sm:px-3 py-1.5 rounded-lg min-w-[50px] text-center shrink-0 border border-brand-100">
-                      {Math.round(task.assignedSeconds / 60)} хв
-                    </div>
-                    
-                    <button 
-                      onClick={() => removeTask(task.id)} 
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-stone-300 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
-                    >
-                      <Icon name="close" size={18} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Додавання задачі */}
-              <div className="flex items-center gap-2 relative mt-4">
-                <input 
-                  type="text" 
-                  value={newTaskTitle} 
-                  onChange={(e) => setNewTaskTitle(e.target.value)} 
-                  onKeyDown={(e) => e.key === "Enter" && addTask()} 
-                  placeholder="Що потрібно зробити?" 
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 pl-4 pr-12 text-sm sm:text-base outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 transition-all font-medium text-stone-800 placeholder-stone-400" 
-                />
-                <button 
-                  onClick={addTask} 
-                  disabled={!newTaskTitle.trim()}
-                  className="absolute right-1.5 top-1.5 bottom-1.5 aspect-square bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:bg-stone-200 disabled:text-stone-400 transition-colors flex items-center justify-center"
-                >
-                  <Icon name="add" size={20} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-stone-200 sm:static sm:bg-transparent sm:p-0 sm:border-none sm:backdrop-blur-none z-20">
-             <button 
-                onClick={handleStart} 
-                className="w-full max-w-2xl mx-auto flex items-center justify-center gap-2 py-4 bg-stone-900 text-white rounded-2xl font-semibold text-lg hover:bg-black hover:shadow-lg hover:shadow-stone-900/20 transition-all active:scale-[0.98]"
-              >
-                Почати сесію <Icon name="play_arrow" size={22} filled />
-              </button>
-          </div>
-        </div>
-      );
-    }
-
-    function ActiveBlockView({ session, updateSession, soundEnabled, finishBlock, abortBlock }) {
-      if (!session || !session.tasks || !session.tasks.length) return null;
-
-      const [isRunning, setIsRunning] = useState(true);
-      const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
-      const [timeLeft, setTimeLeft] = useState(Math.max(1, Math.floor(session.tasks[0]?.assignedSeconds || 1)));
-      const [isDistractionFree, setIsDistractionFree] = useState(false);
-      const [actualSecondsWorked, setActualSecondsWorked] = useState(0);
-      const finishingRef = useRef(false);
-
-      const currentTask = session.tasks[currentTaskIndex];
-      const isLastTask = currentTaskIndex === session.tasks.length - 1;
-
-      const finishCurrentBlock = () => {
-        if (finishingRef.current) return;
+                    ` },
+                        React.createElement("div", { className: "cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 p-1" },
+                            React.createElement(Icon, { name: "drag_indicator", size: 20 })),
+                        React.createElement("div", { className: "w-6 h-6 shrink-0 rounded-full bg-stone-100 flex items-center justify-center text-xs font-semibold text-stone-500" }, idx + 1),
+                        React.createElement("input", { type: "text", value: task.title, onChange: (e) => {
+                                const newTasks = [...config.tasks];
+                                const realIndex = config.tasks.findIndex(t => t.id === task.id);
+                                if (realIndex >= 0)
+                                    newTasks[realIndex].title = e.target.value;
+                                setConfig({ ...config, tasks: newTasks });
+                            }, className: "flex-grow min-w-0 border-none outline-none bg-transparent text-sm sm:text-base text-stone-800 font-medium" }),
+                        config.distributionMode === "priority" && (React.createElement("select", { value: task.priority, onChange: (e) => {
+                                const newTasks = [...config.tasks];
+                                const realIndex = config.tasks.findIndex(t => t.id === task.id);
+                                if (realIndex >= 0)
+                                    newTasks[realIndex].priority = e.target.value;
+                                setConfig({ ...config, tasks: newTasks });
+                            }, className: "text-xs font-medium bg-stone-100 border-none outline-none rounded-lg px-2 py-1.5 text-stone-600 cursor-pointer shrink-0 appearance-none text-center" },
+                            React.createElement("option", { value: "low" }, "\u041D\u0438\u0437\u044C\u043A\u0438\u0439"),
+                            React.createElement("option", { value: "medium" }, "\u0421\u0435\u0440\u0435\u0434\u043D\u0456\u0439"),
+                            React.createElement("option", { value: "high" }, "\u0412\u0438\u0441\u043E\u043A\u0438\u0439"))),
+                        React.createElement("div", { className: "text-xs font-bold text-brand-700 bg-brand-50 px-2 sm:px-3 py-1.5 rounded-lg min-w-[50px] text-center shrink-0 border border-brand-100" },
+                            Math.round(task.assignedSeconds / 60),
+                            " \u0445\u0432"),
+                        React.createElement("button", { onClick: () => removeTask(task.id), className: "w-8 h-8 flex items-center justify-center rounded-full text-stone-300 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0" },
+                            React.createElement(Icon, { name: "close", size: 18 })))))),
+                React.createElement("div", { className: "flex items-center gap-2 relative mt-4" },
+                    React.createElement("input", { type: "text", value: newTaskTitle, onChange: (e) => setNewTaskTitle(e.target.value), onKeyDown: (e) => e.key === "Enter" && addTask(), placeholder: "\u0429\u043E \u043F\u043E\u0442\u0440\u0456\u0431\u043D\u043E \u0437\u0440\u043E\u0431\u0438\u0442\u0438?", className: "w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 pl-4 pr-12 text-sm sm:text-base outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 transition-all font-medium text-stone-800 placeholder-stone-400" }),
+                    React.createElement("button", { onClick: addTask, disabled: !newTaskTitle.trim(), className: "absolute right-1.5 top-1.5 bottom-1.5 aspect-square bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:bg-stone-200 disabled:text-stone-400 transition-colors flex items-center justify-center" },
+                        React.createElement(Icon, { name: "add", size: 20 }))))),
+        React.createElement("div", { className: "fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-stone-200 sm:static sm:bg-transparent sm:p-0 sm:border-none sm:backdrop-blur-none z-20" },
+            React.createElement("button", { onClick: handleStart, className: "w-full max-w-2xl mx-auto flex items-center justify-center gap-2 py-4 bg-stone-900 text-white rounded-2xl font-semibold text-lg hover:bg-black hover:shadow-lg hover:shadow-stone-900/20 transition-all active:scale-[0.98]" },
+                "\u041F\u043E\u0447\u0430\u0442\u0438 \u0441\u0435\u0441\u0456\u044E ",
+                React.createElement(Icon, { name: "play_arrow", size: 22, filled: true })))));
+}
+function ActiveBlockView({ session, updateSession, soundEnabled, finishBlock, abortBlock }) {
+    if (!session || !session.tasks || !session.tasks.length)
+        return null;
+    const getTaskDuration = (index) => { var _a; return Math.max(1, Math.floor(((_a = session.tasks[index]) === null || _a === void 0 ? void 0 : _a.assignedSeconds) || 1)); };
+    const initialDuration = getTaskDuration(0);
+    const [isRunning, setIsRunning] = useState(true);
+    const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(initialDuration);
+    const [isDistractionFree, setIsDistractionFree] = useState(false);
+    const [actualSecondsWorked, setActualSecondsWorked] = useState(0);
+    const finishingRef = useRef(false);
+    const currentTaskIndexRef = useRef(0);
+    const currentTaskStartedAtRef = useRef(Date.now());
+    const endAtRef = useRef(Date.now() + initialDuration * 1000);
+    const baseWorkedSecondsRef = useRef(0);
+    const timeLeftRef = useRef(initialDuration);
+    const isRunningRef = useRef(true);
+    const currentTask = session.tasks[currentTaskIndex];
+    const isLastTask = currentTaskIndex === session.tasks.length - 1;
+    const finishCurrentBlock = (workedSecondsOverride) => {
+        if (finishingRef.current)
+            return;
         finishingRef.current = true;
         setIsRunning(false);
+        isRunningRef.current = false;
         const completedCount = session.tasks.filter(t => t.completed).length;
-        finishBlock({ title: session.title, breakDuration: session.breakDuration, totalTasks: session.tasks.length, completedTasks: completedCount, totalWorkedMinutes: actualSecondsWorked / 60, tasks: session.tasks });
-      };
-
-      const goNextTask = () => {
-        if (isLastTask) {
-          finishCurrentBlock();
-          return;
-        }
-        const nextIndex = currentTaskIndex + 1;
-        setCurrentTaskIndex(nextIndex);
-        setTimeLeft(Math.max(1, Math.floor(session.tasks[nextIndex].assignedSeconds || 1)));
-      };
-
-      useEffect(() => {
-        if (!isRunning || finishingRef.current) return;
-        const interval = setInterval(() => {
-          setTimeLeft(prev => {
-            const next = Math.max(0, prev - 1);
-            if (prev > 0) setActualSecondsWorked(worked => worked + 1);
-            if (next === 0) {
-              window.setTimeout(() => {
-                if (soundEnabled) playSoftChime();
-                goNextTask();
-              }, 0);
+        const workedSeconds = typeof workedSecondsOverride === "number" ? workedSecondsOverride : actualSecondsWorked;
+        finishBlock({
+            title: session.title,
+            breakDuration: session.breakDuration,
+            totalTasks: session.tasks.length,
+            completedTasks: completedCount,
+            totalWorkedMinutes: workedSeconds / 60,
+            tasks: session.tasks
+        });
+    };
+    const syncTimerWithClock = () => {
+        if (!isRunningRef.current || finishingRef.current)
+            return;
+        const now = Date.now();
+        let idx = currentTaskIndexRef.current;
+        let duration = getTaskDuration(idx);
+        let endAt = endAtRef.current;
+        let playedChime = false;
+        // Якщо вкладка була згорнута, браузер може "заморозити" setInterval.
+        // Тому тут ми не віднімаємо 1 секунду, а рахуємо реальний час через Date.now().
+        while (now >= endAt && !finishingRef.current) {
+            baseWorkedSecondsRef.current += duration;
+            if (idx >= session.tasks.length - 1) {
+                if (soundEnabled && !playedChime)
+                    playSoftChime();
+                finishCurrentBlock(baseWorkedSecondsRef.current);
+                return;
             }
-            return next;
-          });
-        }, 1000);
-        return () => clearInterval(interval);
-      }, [isRunning, currentTaskIndex, soundEnabled, isLastTask]);
-
-      const toggleTaskCompletion = (taskId) => {
+            if (soundEnabled && !playedChime) {
+                playSoftChime();
+                playedChime = true;
+            }
+            idx += 1;
+            duration = getTaskDuration(idx);
+            currentTaskIndexRef.current = idx;
+            currentTaskStartedAtRef.current = endAt;
+            endAt += duration * 1000;
+            endAtRef.current = endAt;
+        }
+        const nextTimeLeft = Math.max(0, Math.ceil((endAtRef.current - now) / 1000));
+        const elapsedInCurrent = Math.min(duration, Math.max(0, Math.floor((now - currentTaskStartedAtRef.current) / 1000)));
+        const worked = baseWorkedSecondsRef.current + elapsedInCurrent;
+        timeLeftRef.current = nextTimeLeft;
+        setTimeLeft(nextTimeLeft);
+        setActualSecondsWorked(worked);
+        if (idx !== currentTaskIndex) {
+            setCurrentTaskIndex(idx);
+        }
+    };
+    useEffect(() => {
+        isRunningRef.current = isRunning;
+        if (isRunning) {
+            const duration = getTaskDuration(currentTaskIndexRef.current);
+            const elapsedBeforePause = Math.max(0, duration - timeLeftRef.current);
+            currentTaskStartedAtRef.current = Date.now() - elapsedBeforePause * 1000;
+            endAtRef.current = Date.now() + timeLeftRef.current * 1000;
+            syncTimerWithClock();
+            const interval = setInterval(syncTimerWithClock, 500);
+            window.addEventListener("focus", syncTimerWithClock);
+            document.addEventListener("visibilitychange", syncTimerWithClock);
+            return () => {
+                clearInterval(interval);
+                window.removeEventListener("focus", syncTimerWithClock);
+                document.removeEventListener("visibilitychange", syncTimerWithClock);
+            };
+        }
+    }, [isRunning, soundEnabled]);
+    useEffect(() => {
+        document.title = `Простір Розвитку — ${formatTime(timeLeft)}`;
+        return () => { document.title = "Простір Розвитку"; };
+    }, [timeLeft]);
+    const toggleRunning = () => {
+        if (isRunning) {
+            syncTimerWithClock();
+            setIsRunning(false);
+            isRunningRef.current = false;
+        }
+        else {
+            setIsRunning(true);
+            isRunningRef.current = true;
+        }
+    };
+    const goNextTask = () => {
+        syncTimerWithClock();
+        const now = Date.now();
+        const idx = currentTaskIndexRef.current;
+        const duration = getTaskDuration(idx);
+        const elapsedInCurrent = Math.min(duration, Math.max(0, duration - timeLeftRef.current));
+        baseWorkedSecondsRef.current += elapsedInCurrent;
+        if (idx >= session.tasks.length - 1) {
+            finishCurrentBlock(baseWorkedSecondsRef.current);
+            return;
+        }
+        const nextIndex = idx + 1;
+        const nextDuration = getTaskDuration(nextIndex);
+        currentTaskIndexRef.current = nextIndex;
+        currentTaskStartedAtRef.current = now;
+        endAtRef.current = now + nextDuration * 1000;
+        timeLeftRef.current = nextDuration;
+        setCurrentTaskIndex(nextIndex);
+        setTimeLeft(nextDuration);
+        setActualSecondsWorked(baseWorkedSecondsRef.current);
+    };
+    const toggleTaskCompletion = (taskId) => {
         const updatedTasks = session.tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t);
         updateSession({ ...session, tasks: updatedTasks });
-      };
-
-      const totalSessionSeconds = session.tasks.reduce((sum, t) => sum + Math.max(0, Math.floor(t.assignedSeconds || 0)), 0) || 1;
-      const completedBefore = session.tasks.slice(0, currentTaskIndex).reduce((sum, t) => sum + Math.max(0, Math.floor(t.assignedSeconds || 0)), 0);
-      const currentAssigned = Math.max(1, Math.floor(currentTask.assignedSeconds || 1));
-      const elapsedInCurrent = Math.max(0, currentAssigned - timeLeft);
-      const progressPercent = Math.min(100, Math.max(0, ((completedBefore + elapsedInCurrent) / totalSessionSeconds) * 100));
-
-      return (
-        <div className={`fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] transition-all duration-500 bg-white sm:bg-transparent rounded-[2rem] sm:rounded-none p-4 sm:p-0 ${isDistractionFree ? "mt-0 scale-105" : "mt-2"}`}>
-          
-          <button 
-            onClick={() => setIsDistractionFree(!isDistractionFree)} 
-            className="fixed top-4 right-4 sm:top-6 sm:right-6 text-stone-400 hover:text-stone-800 bg-stone-100 p-2.5 rounded-full transition-all z-10 border border-stone-200" 
-            title={isDistractionFree ? "Звичайний режим" : "Режим фокусу"}
-          >
-            <Icon name={isDistractionFree ? "fullscreen_exit" : "fullscreen"} size={22} />
-          </button>
-
-          {!isDistractionFree && (
-            <div className="w-full max-w-md mb-8 sm:mb-12 text-center px-4">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-bold uppercase tracking-widest mb-6 border border-stone-200">
-                 {session.title}
-              </div>
-              <div className="h-1.5 w-full bg-stone-100 rounded-full overflow-hidden shadow-inner">
-                <div 
-                  className="h-full bg-brand-500 rounded-full transition-all duration-1000 ease-linear" 
-                  style={{ width: `${progressPercent}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
-
-          <div className="text-center mb-8 max-w-xl px-4 w-full">
-            <div className="text-brand-600 font-semibold text-sm mb-3 flex justify-center items-center gap-2 uppercase tracking-widest">
-               <span className={`w-2 h-2 rounded-full bg-brand-500 ${isRunning ? "animate-pulse" : ""}`}></span>
-               Задача {currentTaskIndex + 1} з {session.tasks.length}
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-stone-800 break-words leading-tight">
-              {currentTask.title}
-            </h2>
-          </div>
-
-          {/* Таймер з моноширинним шрифтом */}
-          <div className="text-[6rem] xs:text-[7rem] sm:text-[9rem] font-light text-stone-900 tracking-tighter leading-none mb-12 tabular-nums drop-shadow-sm select-none" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {formatTime(timeLeft)}
-          </div>
-
-          {/* Керування */}
-          <div className="flex items-center justify-center gap-6 mb-12 sm:mb-16">
-            <button 
-              onClick={() => { if(confirm("Завершити сесію достроково?")) abortBlock(); }} 
-              className="w-14 h-14 flex items-center justify-center rounded-full text-stone-400 bg-stone-50 border border-stone-200 hover:text-stone-800 hover:bg-stone-100 transition-all hover:scale-105"
-              title="Зупинити"
-            >
-              <Icon name="close" size={24} />
-            </button>
-            
-            <button 
-              onClick={() => setIsRunning(!isRunning)} 
-              className={`w-24 h-24 flex items-center justify-center rounded-full text-white shadow-xl transition-all hover:scale-105 active:scale-95 border-4
+    };
+    const totalSessionSeconds = session.tasks.reduce((sum, t) => sum + Math.max(0, Math.floor(t.assignedSeconds || 0)), 0) || 1;
+    const completedBefore = session.tasks.slice(0, currentTaskIndex).reduce((sum, t) => sum + Math.max(0, Math.floor(t.assignedSeconds || 0)), 0);
+    const currentAssigned = Math.max(1, Math.floor(currentTask.assignedSeconds || 1));
+    const elapsedInCurrent = Math.max(0, currentAssigned - timeLeft);
+    const progressPercent = Math.min(100, Math.max(0, ((completedBefore + elapsedInCurrent) / totalSessionSeconds) * 100));
+    return (React.createElement("div", { className: `fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] transition-all duration-500 bg-white sm:bg-transparent rounded-[2rem] sm:rounded-none p-4 sm:p-0 ${isDistractionFree ? "mt-0 scale-105" : "mt-2"}` },
+        React.createElement("button", { onClick: () => setIsDistractionFree(!isDistractionFree), className: "fixed top-4 right-4 sm:top-6 sm:right-6 text-stone-400 hover:text-stone-800 bg-stone-100 p-2.5 rounded-full transition-all z-10 border border-stone-200", title: isDistractionFree ? "Звичайний режим" : "Режим фокусу" },
+            React.createElement(Icon, { name: isDistractionFree ? "fullscreen_exit" : "fullscreen", size: 22 })),
+        !isDistractionFree && (React.createElement("div", { className: "w-full max-w-md mb-8 sm:mb-12 text-center px-4" },
+            React.createElement("div", { className: "inline-flex items-center gap-2 px-4 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-bold uppercase tracking-widest mb-6 border border-stone-200" }, session.title),
+            React.createElement("div", { className: "h-1.5 w-full bg-stone-100 rounded-full overflow-hidden shadow-inner" },
+                React.createElement("div", { className: "h-full bg-brand-500 rounded-full transition-all duration-1000 ease-linear", style: { width: `${progressPercent}%` } })))),
+        React.createElement("div", { className: "text-center mb-8 max-w-xl px-4 w-full" },
+            React.createElement("div", { className: "text-brand-600 font-semibold text-sm mb-3 flex justify-center items-center gap-2 uppercase tracking-widest" },
+                React.createElement("span", { className: `w-2 h-2 rounded-full bg-brand-500 ${isRunning ? "animate-pulse" : ""}` }),
+                "\u0417\u0430\u0434\u0430\u0447\u0430 ",
+                currentTaskIndex + 1,
+                " \u0437 ",
+                session.tasks.length),
+            React.createElement("h2", { className: "text-3xl sm:text-4xl font-bold text-stone-800 break-words leading-tight" }, currentTask.title)),
+        React.createElement("div", { className: "text-[6rem] xs:text-[7rem] sm:text-[9rem] font-light text-stone-900 tracking-tighter leading-none mb-12 tabular-nums drop-shadow-sm select-none", style: { fontVariantNumeric: 'tabular-nums' } }, formatTime(timeLeft)),
+        React.createElement("div", { className: "flex items-center justify-center gap-6 mb-12 sm:mb-16" },
+            React.createElement("button", { onClick: () => { if (confirm("Завершити сесію достроково?"))
+                    abortBlock(); }, className: "w-14 h-14 flex items-center justify-center rounded-full text-stone-400 bg-stone-50 border border-stone-200 hover:text-stone-800 hover:bg-stone-100 transition-all hover:scale-105", title: "\u0417\u0443\u043F\u0438\u043D\u0438\u0442\u0438" },
+                React.createElement(Icon, { name: "close", size: 24 })),
+            React.createElement("button", { onClick: toggleRunning, className: `w-24 h-24 flex items-center justify-center rounded-full text-white shadow-xl transition-all hover:scale-105 active:scale-95 border-4
                 ${isRunning ? "bg-brand-500 shadow-brand-500/40 border-brand-400" : "bg-stone-800 shadow-stone-800/30 border-stone-700"}
-              `}
-            >
-              <Icon name={isRunning ? "pause" : "play_arrow"} filled={true} size={40} />
-            </button>
-            
-            <button 
-              onClick={goNextTask} 
-              className="w-14 h-14 flex items-center justify-center rounded-full text-stone-500 bg-stone-50 border border-stone-200 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all hover:scale-105"
-              title="Наступна задача"
-            >
-              <Icon name={isLastTask ? "check" : "skip_next"} size={24} />
-            </button>
-          </div>
-
-          {/* Чекліст */}
-          {!isDistractionFree && (
-            <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-soft border border-stone-100/50">
-              <h3 className="text-sm font-bold text-stone-400 uppercase tracking-widest mb-4 flex items-center justify-between">
-                Список задач
-                <span className="text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md">{session.tasks.filter(t=>t.completed).length}/{session.tasks.length}</span>
-              </h3>
-              <div className="space-y-2 max-h-[30vh] overflow-y-auto pr-2">
-                {session.tasks.map((task, idx) => (
-                  <div 
-                    key={task.id} 
-                    className={`group flex items-start gap-3 p-3 rounded-2xl transition-all cursor-pointer
+              ` },
+                React.createElement(Icon, { name: isRunning ? "pause" : "play_arrow", filled: true, size: 40 })),
+            React.createElement("button", { onClick: goNextTask, className: "w-14 h-14 flex items-center justify-center rounded-full text-stone-500 bg-stone-50 border border-stone-200 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all hover:scale-105", title: "\u041D\u0430\u0441\u0442\u0443\u043F\u043D\u0430 \u0437\u0430\u0434\u0430\u0447\u0430" },
+                React.createElement(Icon, { name: isLastTask ? "check" : "skip_next", size: 24 }))),
+        !isDistractionFree && (React.createElement("div", { className: "w-full max-w-md bg-white rounded-3xl p-6 shadow-soft border border-stone-100/50" },
+            React.createElement("h3", { className: "text-sm font-bold text-stone-400 uppercase tracking-widest mb-4 flex items-center justify-between" },
+                "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u0434\u0430\u0447",
+                React.createElement("span", { className: "text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md" },
+                    session.tasks.filter(t => t.completed).length,
+                    "/",
+                    session.tasks.length)),
+            React.createElement("div", { className: "space-y-2 max-h-[30vh] overflow-y-auto pr-2" }, session.tasks.map((task, idx) => (React.createElement("div", { key: task.id, className: `group flex items-start gap-3 p-3 rounded-2xl transition-all cursor-pointer
                       ${idx === currentTaskIndex ? "bg-brand-50/50 border border-brand-200" : "border border-transparent hover:bg-stone-50"}
-                    `} 
-                    onClick={() => toggleTaskCompletion(task.id)}
-                  >
-                    <div className={`mt-0.5 shrink-0 transition-colors ${task.completed ? "text-brand-500" : "text-stone-300 group-hover:text-stone-400"}`}>
-                      <Icon name={task.completed ? "check_circle" : "radio_button_unchecked"} size={22} filled={task.completed} />
-                    </div>
-                    <div className={`flex-grow text-sm min-w-0 break-words pt-0.5
+                    `, onClick: () => toggleTaskCompletion(task.id) },
+                React.createElement("div", { className: `mt-0.5 shrink-0 transition-colors ${task.completed ? "text-brand-500" : "text-stone-300 group-hover:text-stone-400"}` },
+                    React.createElement(Icon, { name: task.completed ? "check_circle" : "radio_button_unchecked", size: 22, filled: task.completed })),
+                React.createElement("div", { className: `flex-grow text-sm min-w-0 break-words pt-0.5
                       ${task.completed ? "text-stone-400 line-through decoration-stone-300" : "text-stone-800"} 
                       ${idx === currentTaskIndex ? "font-semibold" : "font-medium"}
-                    `}>
-                      {task.title}
-                    </div>
-                    {idx > currentTaskIndex && (
-                      <div className="text-xs font-semibold text-stone-400 bg-stone-100 px-2 py-1 rounded-lg shrink-0">
-                        {Math.round(task.assignedSeconds / 60)} хв
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
+                    ` }, task.title),
+                idx > currentTaskIndex && (React.createElement("div", { className: "text-xs font-semibold text-stone-400 bg-stone-100 px-2 py-1 rounded-lg shrink-0" },
+                    Math.round(task.assignedSeconds / 60),
+                    " \u0445\u0432"))))))))));
+}
+function BreakView({ duration, finishBreak, soundEnabled }) {
+    const initialSeconds = Math.max(0, Math.floor((Number(duration) || 0) * 60));
+    const [timeLeft, setTimeLeft] = useState(initialSeconds);
+    const finishedRef = useRef(false);
+    const endAtRef = useRef(Date.now() + initialSeconds * 1000);
+    useEffect(() => {
+        const syncBreakTimer = () => {
+            if (finishedRef.current)
+                return;
+            const next = Math.max(0, Math.ceil((endAtRef.current - Date.now()) / 1000));
+            setTimeLeft(next);
+            if (next <= 0) {
+                finishedRef.current = true;
+                if (soundEnabled)
+                    playSoftChime();
+                finishBreak();
+            }
+        };
+        syncBreakTimer();
+        const timer = setInterval(syncBreakTimer, 500);
+        window.addEventListener("focus", syncBreakTimer);
+        document.addEventListener("visibilitychange", syncBreakTimer);
+        return () => {
+            clearInterval(timer);
+            window.removeEventListener("focus", syncBreakTimer);
+            document.removeEventListener("visibilitychange", syncBreakTimer);
+        };
+    }, [finishBreak, soundEnabled]);
+    return (React.createElement("div", { className: "fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] text-center px-4 bg-[#f0f9ff] rounded-[2rem] sm:rounded-none" },
+        React.createElement("div", { className: "w-20 h-20 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mb-8 shadow-sm" },
+            React.createElement(Icon, { name: "self_improvement", size: 40 })),
+        React.createElement("h2", { className: "text-3xl font-bold text-slate-800 mb-3" }, "\u0427\u0430\u0441 \u043F\u0435\u0440\u0435\u043F\u043E\u0447\u0438\u0442\u0438"),
+        React.createElement("p", { className: "text-slate-500 text-base mb-12 max-w-sm" }, "\u0412\u0456\u0434\u0432\u0435\u0434\u0456\u0442\u044C \u043F\u043E\u0433\u043B\u044F\u0434 \u0432\u0456\u0434 \u0435\u043A\u0440\u0430\u043D\u0443, \u0440\u043E\u0437\u0456\u043C\u043D\u0456\u0442\u044C\u0441\u044F \u0430\u0431\u043E \u0432\u0438\u043F\u0438\u0439\u0442\u0435 \u0432\u043E\u0434\u0438. \u0412\u0430\u0448 \u043C\u043E\u0437\u043E\u043A \u043F\u043E\u0442\u0440\u0435\u0431\u0443\u0454 \u043F\u0430\u0443\u0437\u0438."),
+        React.createElement("div", { className: "text-[6rem] sm:text-[8rem] font-light text-blue-900 tracking-tighter mb-16 tabular-nums", style: { fontVariantNumeric: 'tabular-nums' } }, formatTime(timeLeft)),
+        React.createElement("button", { onClick: finishBreak, className: "px-8 py-3.5 bg-white border border-blue-100 text-slate-600 rounded-2xl hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 font-semibold transition-all shadow-sm active:scale-95" }, "\u041F\u0440\u043E\u043F\u0443\u0441\u0442\u0438\u0442\u0438 \u0432\u0456\u0434\u043F\u043E\u0447\u0438\u043D\u043E\u043A")));
+}
+function SummaryView({ session, startBreak, goHome }) {
+    if (!session)
+        return null;
+    const isPerfect = session.completedTasks === session.totalTasks;
+    const progress = Math.round((session.completedTasks / session.totalTasks) * 100) || 0;
+    return (React.createElement("div", { className: "slide-up max-w-lg mx-auto pt-6 sm:pt-10 pb-12" },
+        React.createElement("div", { className: "bg-white rounded-[2.5rem] p-6 sm:p-10 shadow-float border border-stone-100/50 text-center relative overflow-hidden" },
+            React.createElement("div", { className: "absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-brand-50 to-transparent" }),
+            React.createElement("div", { className: "relative z-10" },
+                React.createElement("div", { className: "w-24 h-24 mx-auto bg-white rounded-full shadow-md border-4 border-white flex items-center justify-center mb-6" }, isPerfect ? (React.createElement("div", { className: "w-full h-full rounded-full bg-brand-500 text-white flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]" },
+                    React.createElement(Icon, { name: "celebration", size: 40 }))) : (React.createElement("div", { className: "w-full h-full rounded-full bg-stone-100 text-stone-600 flex items-center justify-center" },
+                    React.createElement(Icon, { name: "done_all", size: 40 })))),
+                React.createElement("h2", { className: "text-3xl font-bold text-stone-800 mb-2" }, "\u0421\u0435\u0441\u0456\u044E \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043E"),
+                React.createElement("p", { className: "text-stone-500 mb-8 font-medium" }, "\u0427\u0443\u0434\u043E\u0432\u0430 \u0440\u043E\u0431\u043E\u0442\u0430! \u041E\u0441\u044C \u0432\u0430\u0448\u0456 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0438."),
+                React.createElement("div", { className: "grid grid-cols-2 gap-4 mb-8 text-left" },
+                    React.createElement("div", { className: "bg-stone-50 border border-stone-100 p-5 rounded-2xl" },
+                        React.createElement("div", { className: "text-stone-400 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1" },
+                            React.createElement(Icon, { name: "timer", size: 16 }),
+                            " \u0424\u043E\u043A\u0443\u0441"),
+                        React.createElement("div", { className: "text-3xl font-bold text-stone-800" },
+                            Math.round(session.totalWorkedMinutes),
+                            " ",
+                            React.createElement("span", { className: "text-lg text-stone-400 font-medium" }, "\u0445\u0432"))),
+                    React.createElement("div", { className: "bg-stone-50 border border-stone-100 p-5 rounded-2xl" },
+                        React.createElement("div", { className: "text-stone-400 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1" },
+                            React.createElement(Icon, { name: "task", size: 16 }),
+                            " \u0417\u0430\u0434\u0430\u0447\u0456"),
+                        React.createElement("div", { className: "flex items-baseline gap-1" },
+                            React.createElement("span", { className: `text-3xl font-bold ${isPerfect ? "text-brand-600" : "text-stone-800"}` }, session.completedTasks),
+                            React.createElement("span", { className: "text-lg text-stone-400 font-medium" },
+                                "/ ",
+                                session.totalTasks)))),
+                React.createElement("div", { className: "mb-8 bg-stone-50 p-4 rounded-2xl border border-stone-100" },
+                    React.createElement("div", { className: "flex justify-between text-sm font-bold text-stone-600 mb-2" },
+                        React.createElement("span", null, "\u0415\u0444\u0435\u043A\u0442\u0438\u0432\u043D\u0456\u0441\u0442\u044C"),
+                        React.createElement("span", { className: isPerfect ? "text-brand-600" : "" },
+                            progress,
+                            "%")),
+                    React.createElement("div", { className: "h-2 w-full bg-stone-200 rounded-full overflow-hidden" },
+                        React.createElement("div", { className: "h-full bg-brand-500 rounded-full", style: { width: `${progress}%` } }))),
+                React.createElement("div", { className: "flex flex-col gap-3" },
+                    session.breakDuration > 0 && (React.createElement("button", { onClick: startBreak, className: "w-full py-4 bg-brand-500 text-white rounded-2xl font-semibold text-lg hover:bg-brand-600 shadow-md shadow-brand-500/20 transition-all active:scale-[0.98]" },
+                        "\u041F\u0435\u0440\u0435\u0440\u0432\u0430 (",
+                        session.breakDuration,
+                        " \u0445\u0432)")),
+                    React.createElement("button", { onClick: goHome, className: `w-full py-4 rounded-2xl font-semibold text-lg transition-all active:scale-[0.98] ${session.breakDuration > 0 ? "bg-stone-100 text-stone-600 hover:bg-stone-200" : "bg-stone-900 text-white hover:bg-black shadow-md"}` }, session.breakDuration > 0 ? "Пропустити та на головну" : "Повернутись на головну"))))));
+}
+function HistoryView({ history, goBack }) {
+    return (React.createElement("div", { className: "slide-up max-w-3xl mx-auto pb-12" },
+        React.createElement("div", { className: "flex items-center mb-8 gap-4 px-2" },
+            React.createElement("button", { onClick: goBack, className: "w-10 h-10 bg-white border border-stone-200 rounded-full shadow-sm hover:bg-stone-50 text-stone-600 flex items-center justify-center transition-colors" },
+                React.createElement(Icon, { name: "arrow_back", size: 20 })),
+            React.createElement("div", null,
+                React.createElement("h2", { className: "text-2xl font-bold text-stone-800" }, "\u0406\u0441\u0442\u043E\u0440\u0456\u044F \u0441\u0435\u0441\u0456\u0439"),
+                React.createElement("p", { className: "text-sm text-stone-500 font-medium" }, "\u0412\u0441\u0456 \u0432\u0430\u0448\u0456 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0456 \u0444\u043E\u043A\u0443\u0441-\u0431\u043B\u043E\u043A\u0438"))),
+        history.length === 0 ? (React.createElement("div", { className: "text-center py-24 bg-white rounded-[2rem] border border-stone-200 border-dashed shadow-sm" },
+            React.createElement("div", { className: "w-20 h-20 bg-stone-50 text-stone-300 rounded-full flex items-center justify-center mx-auto mb-4" },
+                React.createElement(Icon, { name: "history", size: 40 })),
+            React.createElement("h3", { className: "text-lg font-semibold text-stone-700 mb-1" }, "\u041F\u043E\u043A\u0438 \u0449\u043E \u043F\u043E\u0440\u043E\u0436\u043D\u044C\u043E"),
+            React.createElement("p", { className: "text-stone-500 text-sm" }, "\u0412\u0438 \u0449\u0435 \u043D\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u043B\u0438 \u0436\u043E\u0434\u043D\u043E\u0433\u043E \u0431\u043B\u043E\u043A\u0443."))) : (React.createElement("div", { className: "space-y-4" }, history.map((block, idx) => (React.createElement("div", { key: idx, className: "bg-white p-5 sm:p-6 rounded-3xl shadow-soft border border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-5 hover:border-brand-200 transition-colors group" },
+            React.createElement("div", { className: "flex items-start gap-4 min-w-0" },
+                React.createElement("div", { className: "w-12 h-12 rounded-2xl bg-stone-50 group-hover:bg-brand-50 text-stone-400 group-hover:text-brand-500 flex items-center justify-center shrink-0 transition-colors" },
+                    React.createElement(Icon, { name: "task_alt", size: 24 })),
+                React.createElement("div", { className: "min-w-0 pt-0.5" },
+                    React.createElement("h3", { className: "font-bold text-lg text-stone-800 mb-1 truncate" }, block.title),
+                    React.createElement("div", { className: "text-sm text-stone-500 font-medium flex items-center gap-1.5" },
+                        React.createElement(Icon, { name: "calendar_today", size: 14, className: "text-stone-400" }),
+                        new Date(block.date).toLocaleString("uk-UA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })))),
+            React.createElement("div", { className: "flex items-center gap-6 sm:gap-8 bg-stone-50 p-3 rounded-2xl sm:bg-transparent sm:p-0" },
+                React.createElement("div", { className: "text-center sm:text-right flex-1 sm:flex-none" },
+                    React.createElement("div", { className: "text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1" }, "\u0424\u043E\u043A\u0443\u0441"),
+                    React.createElement("div", { className: "font-bold text-stone-800 text-lg" },
+                        Math.round(block.totalWorkedMinutes),
+                        " ",
+                        React.createElement("span", { className: "text-sm text-stone-500 font-medium" }, "\u0445\u0432"))),
+                React.createElement("div", { className: "w-px h-10 bg-stone-200 hidden sm:block" }),
+                React.createElement("div", { className: "text-center sm:text-right flex-1 sm:flex-none" },
+                    React.createElement("div", { className: "text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1" }, "\u0417\u0430\u0434\u0430\u0447\u0456"),
+                    React.createElement("div", { className: "font-bold text-stone-800 text-lg" },
+                        React.createElement("span", { className: block.completedTasks === block.totalTasks ? "text-brand-600" : "" }, block.completedTasks),
+                        React.createElement("span", { className: "text-sm text-stone-400 font-medium" },
+                            "/",
+                            block.totalTasks)))))))))));
+}
+const rootElement = document.getElementById("root");
+rootElement.dataset.reactMounted = "true";
+const root = ReactDOM.createRoot(rootElement);
+root.render(React.createElement(App, null));
 
-    function BreakView({ duration, finishBreak, soundEnabled }) {
-      const [timeLeft, setTimeLeft] = useState(Math.max(0, Math.floor((Number(duration) || 0) * 60)));
-      const finishedRef = useRef(false);
-
-      useEffect(() => {
-        if (finishedRef.current) return;
-        if (timeLeft <= 0) {
-          finishedRef.current = true;
-          if (soundEnabled) playSoftChime();
-          finishBreak();
-          return;
-        }
-        const timer = setInterval(() => setTimeLeft(prev => Math.max(0, prev - 1)), 1000);
-        return () => clearInterval(timer);
-      }, [timeLeft, finishBreak, soundEnabled]);
-
-      return (
-        <div className="fade-in flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] text-center px-4 bg-[#f0f9ff] rounded-[2rem] sm:rounded-none">
-          <div className="w-20 h-20 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mb-8 shadow-sm">
-             <Icon name="self_improvement" size={40} />
-          </div>
-          <h2 className="text-3xl font-bold text-slate-800 mb-3">Час перепочити</h2>
-          <p className="text-slate-500 text-base mb-12 max-w-sm">
-            Відведіть погляд від екрану, розімніться або випийте води. Ваш мозок потребує паузи.
-          </p>
-          
-          <div className="text-[6rem] sm:text-[8rem] font-light text-blue-900 tracking-tighter mb-16 tabular-nums" style={{ fontVariantNumeric: 'tabular-nums' }}>
-             {formatTime(timeLeft)}
-          </div>
-          
-          <button 
-            onClick={finishBreak} 
-            className="px-8 py-3.5 bg-white border border-blue-100 text-slate-600 rounded-2xl hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 font-semibold transition-all shadow-sm active:scale-95"
-          >
-            Пропустити відпочинок
-          </button>
-        </div>
-      );
-    }
-
-    function SummaryView({ session, startBreak, goHome }) {
-      if (!session) return null;
-      const isPerfect = session.completedTasks === session.totalTasks;
-      const progress = Math.round((session.completedTasks / session.totalTasks) * 100) || 0;
-
-      return (
-        <div className="slide-up max-w-lg mx-auto pt-6 sm:pt-10 pb-12">
-          <div className="bg-white rounded-[2.5rem] p-6 sm:p-10 shadow-float border border-stone-100/50 text-center relative overflow-hidden">
-            {/* Декоративний фон */}
-            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-brand-50 to-transparent"></div>
-            
-            <div className="relative z-10">
-              <div className="w-24 h-24 mx-auto bg-white rounded-full shadow-md border-4 border-white flex items-center justify-center mb-6">
-                 {isPerfect ? (
-                    <div className="w-full h-full rounded-full bg-brand-500 text-white flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]"><Icon name="celebration" size={40} /></div>
-                 ) : (
-                    <div className="w-full h-full rounded-full bg-stone-100 text-stone-600 flex items-center justify-center"><Icon name="done_all" size={40} /></div>
-                 )}
-              </div>
-              
-              <h2 className="text-3xl font-bold text-stone-800 mb-2">Сесію завершено</h2>
-              <p className="text-stone-500 mb-8 font-medium">Чудова робота! Ось ваші результати.</p>
-              
-              <div className="grid grid-cols-2 gap-4 mb-8 text-left">
-                <div className="bg-stone-50 border border-stone-100 p-5 rounded-2xl">
-                   <div className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1"><Icon name="timer" size={16}/> Фокус</div>
-                   <div className="text-3xl font-bold text-stone-800">{Math.round(session.totalWorkedMinutes)} <span className="text-lg text-stone-400 font-medium">хв</span></div>
-                </div>
-                <div className="bg-stone-50 border border-stone-100 p-5 rounded-2xl">
-                   <div className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1"><Icon name="task" size={16}/> Задачі</div>
-                   <div className="flex items-baseline gap-1">
-                      <span className={`text-3xl font-bold ${isPerfect ? "text-brand-600" : "text-stone-800"}`}>{session.completedTasks}</span>
-                      <span className="text-lg text-stone-400 font-medium">/ {session.totalTasks}</span>
-                   </div>
-                </div>
-              </div>
-
-              {/* Прогрес бар */}
-              <div className="mb-8 bg-stone-50 p-4 rounded-2xl border border-stone-100">
-                <div className="flex justify-between text-sm font-bold text-stone-600 mb-2">
-                   <span>Ефективність</span>
-                   <span className={isPerfect ? "text-brand-600" : ""}>{progress}%</span>
-                </div>
-                <div className="h-2 w-full bg-stone-200 rounded-full overflow-hidden">
-                   <div className="h-full bg-brand-500 rounded-full" style={{width: `${progress}%`}}></div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                {session.breakDuration > 0 && (
-                  <button 
-                    onClick={startBreak} 
-                    className="w-full py-4 bg-brand-500 text-white rounded-2xl font-semibold text-lg hover:bg-brand-600 shadow-md shadow-brand-500/20 transition-all active:scale-[0.98]"
-                  >
-                    Перерва ({session.breakDuration} хв)
-                  </button>
-                )}
-                <button 
-                  onClick={goHome} 
-                  className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all active:scale-[0.98] ${session.breakDuration > 0 ? "bg-stone-100 text-stone-600 hover:bg-stone-200" : "bg-stone-900 text-white hover:bg-black shadow-md"}`}
-                >
-                  {session.breakDuration > 0 ? "Пропустити та на головну" : "Повернутись на головну"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    function HistoryView({ history, goBack }) {
-      return (
-        <div className="slide-up max-w-3xl mx-auto pb-12">
-          <div className="flex items-center mb-8 gap-4 px-2">
-            <button 
-              onClick={goBack} 
-              className="w-10 h-10 bg-white border border-stone-200 rounded-full shadow-sm hover:bg-stone-50 text-stone-600 flex items-center justify-center transition-colors"
-            >
-               <Icon name="arrow_back" size={20} />
-            </button>
-            <div>
-               <h2 className="text-2xl font-bold text-stone-800">Історія сесій</h2>
-               <p className="text-sm text-stone-500 font-medium">Всі ваші завершені фокус-блоки</p>
-            </div>
-          </div>
-
-          {history.length === 0 ? (
-            <div className="text-center py-24 bg-white rounded-[2rem] border border-stone-200 border-dashed shadow-sm">
-              <div className="w-20 h-20 bg-stone-50 text-stone-300 rounded-full flex items-center justify-center mx-auto mb-4">
-                 <Icon name="history" size={40} />
-              </div>
-              <h3 className="text-lg font-semibold text-stone-700 mb-1">Поки що порожньо</h3>
-              <p className="text-stone-500 text-sm">Ви ще не завершили жодного блоку.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {history.map((block, idx) => (
-                <div key={idx} className="bg-white p-5 sm:p-6 rounded-3xl shadow-soft border border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-5 hover:border-brand-200 transition-colors group">
-                  <div className="flex items-start gap-4 min-w-0">
-                     <div className="w-12 h-12 rounded-2xl bg-stone-50 group-hover:bg-brand-50 text-stone-400 group-hover:text-brand-500 flex items-center justify-center shrink-0 transition-colors">
-                        <Icon name="task_alt" size={24} />
-                     </div>
-                    <div className="min-w-0 pt-0.5">
-                      <h3 className="font-bold text-lg text-stone-800 mb-1 truncate">{block.title}</h3>
-                      <div className="text-sm text-stone-500 font-medium flex items-center gap-1.5">
-                         <Icon name="calendar_today" size={14} className="text-stone-400" /> 
-                         {new Date(block.date).toLocaleString("uk-UA", { day: "numeric", month: "long", hour: "2-digit", minute:"2-digit" })}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-6 sm:gap-8 bg-stone-50 p-3 rounded-2xl sm:bg-transparent sm:p-0">
-                    <div className="text-center sm:text-right flex-1 sm:flex-none">
-                       <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Фокус</div>
-                       <div className="font-bold text-stone-800 text-lg">{Math.round(block.totalWorkedMinutes)} <span className="text-sm text-stone-500 font-medium">хв</span></div>
-                    </div>
-                    <div className="w-px h-10 bg-stone-200 hidden sm:block"></div>
-                    <div className="text-center sm:text-right flex-1 sm:flex-none">
-                       <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Задачі</div>
-                       <div className="font-bold text-stone-800 text-lg">
-                          <span className={block.completedTasks === block.totalTasks ? "text-brand-600" : ""}>{block.completedTasks}</span>
-                          <span className="text-sm text-stone-400 font-medium">/{block.totalTasks}</span>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
-  </script>
+</script>
 </body>
 </html>
