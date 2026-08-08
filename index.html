@@ -214,6 +214,87 @@ const calculateTaskTimes = (tasks, totalMinutes, mode) => {
     });
 };
 const getInitialDailyTasks = () => Array.from({ length: 10 }, () => ({ id: uid(), text: "", done: false }));
+const DAY_SEPARATOR = "—————————————————————";
+const getTodayInputValue = () => {
+    const now = new Date();
+    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 10);
+};
+const formatDateShort = (dateValue) => {
+    if (!dateValue)
+        return "";
+    const parts = String(dateValue).split("-");
+    if (parts.length !== 3)
+        return dateValue;
+    return `${parts[2]}.${parts[1]}.${parts[0].slice(-2)}`;
+};
+const getInitialDayRecord = () => ({
+    morningHabits: [
+        { id: "morning-routine", label: "Morning routine", done: false },
+        { id: "watch-cases", label: "Watching 5 cases", done: false },
+        { id: "exercise", label: "Abs | Push-ups", done: false }
+    ],
+    workBlocks: Array.from({ length: 5 }, (_, index) => ({ id: `work-${index + 1}`, title: "", done: false })),
+    studyBlocks: Array.from({ length: 2 }, (_, index) => ({ id: `study-${index + 1}`, title: "", done: false })),
+    metrics: [
+        { id: "videos", label: "5 videos per channel", current: 0, target: 5 },
+        { id: "steps", label: "10 thousand steps", current: 0, target: 10 },
+        { id: "water", label: "3 liters of water", current: 0, target: 6 },
+        { id: "games", label: "Play 5 games", current: 0, target: 5 }
+    ],
+    badHabits: [
+        { id: "fast-food", label: "No fast food", status: null },
+        { id: "alcohol", label: "No alcohol", status: null },
+        { id: "masturbation", label: "No masturbation", status: null },
+        { id: "sweets", label: "No sweets", status: null },
+        { id: "timer", label: "Don’t turn off the timer", status: null },
+        { id: "smoking", label: "No daytime smoking", status: null }
+    ],
+    eveningDone: false,
+    closed: false,
+    updatedAt: new Date().toISOString()
+});
+const getDayKey = (identity) => `${identity.dayNumber || "day"}-${identity.date || "date"}`;
+const statusPrefix = (status) => status === "success" ? "✅ " : status === "failed" ? "❌ " : "";
+const buildFullDayText = (identity, record, planTasks) => {
+    const list = (items, prefix) => items.map((item, index) => `${prefix(item)}${index + 1}. ${item.label || item.title || ""}`.trimEnd()).join(TELEGRAM_SEPARATOR);
+    const blockList = (items) => items.map((item, index) => `${item.done ? "✅ " : ""}${index + 1}.${item.title ? ` ${item.title}` : ""}`).join(TELEGRAM_SEPARATOR);
+    const planText = buildTelegramTextFromTasks(planTasks);
+    return [
+        `Viktor ULS | Day ${identity.dayNumber}\n${DAY_SEPARATOR}\n📅 Plan for ${formatDateShort(identity.date)}\n${DAY_SEPARATOR}`,
+        `➡️ Morning habits:\n${DAY_SEPARATOR}`,
+        list(record.morningHabits, item => item.done ? "✅ " : ""),
+        `➡️ Daily plan:\n${DAY_SEPARATOR}`,
+        planText,
+        `➡️ Blocks per day:\n${DAY_SEPARATOR}`,
+        "▶️ 5 blocks of 60 minutes of work:",
+        blockList(record.workBlocks),
+        DAY_SEPARATOR,
+        "▶️ 2 blocks of 60 minutes of studying:",
+        blockList(record.studyBlocks),
+        `➡️ Daily metrics:\n${DAY_SEPARATOR}`,
+        record.metrics.map((metric, index) => `${metric.current >= metric.target ? "✅ " : ""}${index + 1}. ${metric.label} | ${metric.current}/${metric.target}`).join(TELEGRAM_SEPARATOR),
+        `➡️ No bad habits:\n${DAY_SEPARATOR}`,
+        list(record.badHabits, item => statusPrefix(item.status)),
+        `➡️ Evening habits:\n${DAY_SEPARATOR}`,
+        `${record.eveningDone ? "✅ " : ""}1. Routine before bed`
+    ].join(TELEGRAM_SEPARATOR);
+};
+const copyTextToClipboard = async (text) => {
+    try {
+        await navigator.clipboard.writeText(text);
+    }
+    catch (_a) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+    }
+};
 // Кастомний хук для LocalStorage (логіка без змін)
 function useStoredState(key, initialValue) {
     const [value, setValue] = useState(() => {
@@ -236,6 +317,8 @@ function useStoredState(key, initialValue) {
 function App() {
     const [section, setSection] = useState("plan");
     const [focusView, setFocusView] = useState("dashboard");
+    const [dayIdentity, setDayIdentity] = useStoredState("ulsDayIdentityV1", { dayNumber: "", date: getTodayInputValue() });
+    const [showDaySetup, setShowDaySetup] = useState(true);
     const [history, setHistory] = useStoredState("focusHistoryV2", []);
     const [soundEnabled, setSoundEnabled] = useStoredState("soundEnabledV1", true);
     const [blockConfig, setBlockConfig] = useStoredState("focusBlockDraftV2", {
@@ -246,6 +329,11 @@ function App() {
         tasks: []
     });
     const [activeSession, setActiveSession] = useState(null);
+    const completeDaySetup = (identity) => {
+        setDayIdentity(identity);
+        setShowDaySetup(false);
+        setSection("day");
+    };
     const openFocusCreate = () => {
         setSection("focus");
         setFocusView("create");
@@ -272,6 +360,7 @@ function App() {
     };
     const isFullTimer = section === "focus" && (focusView === "active" || focusView === "break");
     return (React.createElement("div", { className: "min-h-screen text-stone-800 font-sans flex flex-col" },
+        showDaySetup && React.createElement(DaySetupModal, { identity: dayIdentity, onComplete: completeDaySetup }),
         !isFullTimer && (React.createElement("nav", { className: "sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-100/50" },
             React.createElement("div", { className: "max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4" },
                 React.createElement("div", { className: "flex items-center justify-between gap-3" },
@@ -285,9 +374,14 @@ function App() {
                 React.createElement("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide" },
                     React.createElement(TabButton, { active: section === "plan", onClick: () => setSection("plan"), icon: "view_list", label: "\u041F\u043B\u0430\u043D \u043D\u0430 \u0434\u0435\u043D\u044C" }),
                     React.createElement(TabButton, { active: section === "focus", onClick: () => { setSection("focus"); setFocusView("dashboard"); }, icon: "timer", label: "\u0424\u043E\u043A\u0443\u0441-\u0431\u043B\u043E\u043A" }),
+                    React.createElement(TabButton, { active: section === "day", onClick: () => setSection("day"), icon: "event_available", label: "\u041C\u0456\u0439 \u0434\u0435\u043D\u044C" }),
                     React.createElement("div", { className: "hidden sm:flex gap-2 ml-4 pl-4 border-l border-stone-200" },
                         React.createElement(TopIconButton, { onClick: () => setSoundEnabled(!soundEnabled), icon: soundEnabled ? "volume_up" : "volume_off", active: soundEnabled, title: "\u0417\u0432\u0443\u043A" })))))),
-        React.createElement("main", { className: `flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 safe-bottom ${isFullTimer ? "pt-4" : "pt-8 sm:pt-10"}` }, section === "plan" ? React.createElement(DailyPlanView, { openFocusCreate: openFocusCreate }) : renderFocusView())));
+        React.createElement("main", { className: `flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 safe-bottom ${isFullTimer ? "pt-4" : "pt-8 sm:pt-10"}` }, section === "plan"
+            ? React.createElement(DailyPlanView, { openFocusCreate: openFocusCreate })
+            : section === "day"
+                ? React.createElement(DailyTrackerView, { key: getDayKey(dayIdentity), identity: dayIdentity, editDay: () => setShowDaySetup(true) })
+                : renderFocusView())));
 }
 // Оновлені компоненти навігації
 function TopIconButton({ onClick, icon, active, title }) {
@@ -303,6 +397,193 @@ function TabButton({ active, onClick, icon, label }) {
             : "bg-transparent text-stone-500 hover:bg-stone-100 hover:text-stone-800"}` },
         React.createElement(Icon, { name: icon, size: 18, filled: active }),
         label));
+}
+function DaySetupModal({ identity, onComplete }) {
+    const h = React.createElement;
+    const [step, setStep] = useState(1);
+    const [dayNumber, setDayNumber] = useState(String(identity.dayNumber || ""));
+    const [date, setDate] = useState(identity.date || getTodayInputValue());
+    const validDay = Number.isInteger(Number(dayNumber)) && Number(dayNumber) > 0;
+    const submitDay = (event) => {
+        event.preventDefault();
+        const submittedDay = event.currentTarget.elements["uls-day-number"].value;
+        if (Number.isInteger(Number(submittedDay)) && Number(submittedDay) > 0) {
+            setDayNumber(String(Math.floor(Number(submittedDay))));
+            setStep(2);
+        }
+    };
+    const submitDate = (event) => {
+        event.preventDefault();
+        const submittedDate = event.currentTarget.elements["uls-date"].value;
+        if (!submittedDate)
+            return;
+        onComplete({ dayNumber: String(Math.floor(Number(dayNumber))), date: submittedDate });
+    };
+    return h("div", { className: "fixed inset-0 z-[100] bg-stone-950/45 backdrop-blur-sm flex items-center justify-center p-4 fade-in" },
+        h("div", { className: "w-full max-w-md bg-white rounded-[2rem] shadow-2xl shadow-stone-950/20 overflow-hidden slide-up" },
+            h("div", { className: "h-1.5 bg-stone-100" },
+                h("div", { className: "h-full bg-brand-500 transition-all duration-500", style: { width: step === 1 ? "50%" : "100%" } })),
+            h("div", { className: "p-6 sm:p-8" },
+                h("div", { className: "flex items-center justify-between mb-8" },
+                    h("div", { className: "w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center" }, h(Icon, { name: step === 1 ? "tag" : "calendar_month", size: 26 })),
+                    h("span", { className: "text-xs font-bold tracking-widest uppercase text-stone-400" }, `Крок ${step} з 2`)),
+                step === 1
+                    ? h("form", { onSubmit: submitDay },
+                        h("h2", { className: "text-3xl font-bold tracking-tight text-stone-800 mb-2" }, "Номер дня"),
+                        h("p", { className: "text-stone-500 mb-7 leading-relaxed" }, "Вкажіть номер поточного дня у вашій системі Viktor ULS."),
+                        h("label", { className: "block text-sm font-semibold text-stone-600 mb-2", htmlFor: "uls-day-number" }, "Day"),
+                        h("input", { id: "uls-day-number", name: "uls-day-number", type: "number", min: "1", step: "1", inputMode: "numeric", autoFocus: true, value: dayNumber, onChange: event => setDayNumber(event.target.value), placeholder: "243", className: "w-full h-16 rounded-2xl bg-stone-50 border-2 border-stone-100 px-5 text-2xl font-semibold text-stone-800 focus:border-brand-400 focus:bg-white transition-colors" }),
+                        h("button", { type: "submit", disabled: !validDay, className: "mt-6 w-full h-14 rounded-2xl bg-stone-800 text-white font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-900" }, "Далі", h(Icon, { name: "arrow_forward", size: 20 })))
+                    : h("form", { onSubmit: submitDate },
+                        h("h2", { className: "text-3xl font-bold tracking-tight text-stone-800 mb-2" }, "Дата плану"),
+                        h("p", { className: "text-stone-500 mb-7 leading-relaxed" }, "Оберіть дату, для якої створюється щоденний трекер."),
+                        h("label", { className: "block text-sm font-semibold text-stone-600 mb-2", htmlFor: "uls-date" }, "Plan for"),
+                        h("input", { id: "uls-date", name: "uls-date", type: "date", autoFocus: true, value: date, onChange: event => setDate(event.target.value), className: "w-full h-16 rounded-2xl bg-stone-50 border-2 border-stone-100 px-5 text-xl font-semibold text-stone-800 focus:border-brand-400 focus:bg-white transition-colors" }),
+                        h("div", { className: "grid grid-cols-[auto_1fr] gap-3 mt-6" },
+                            h("button", { type: "button", onClick: () => setStep(1), className: "w-14 h-14 rounded-2xl bg-stone-100 text-stone-600 flex items-center justify-center hover:bg-stone-200", title: "Назад" }, h(Icon, { name: "arrow_back", size: 20 })),
+                            h("button", { type: "submit", disabled: !date, className: "h-14 rounded-2xl bg-brand-500 text-white font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-600 shadow-md shadow-brand-500/20" }, "Відкрити мій день", h(Icon, { name: "check", size: 20 })))))));
+}
+function TrackerSection({ icon, title, subtitle, complete, children }) {
+    const h = React.createElement;
+    return h("section", { className: `bg-white rounded-3xl p-4 sm:p-6 shadow-soft border transition-colors ${complete ? "border-brand-200" : "border-stone-100/60"}` },
+        h("div", { className: "flex items-start gap-3 mb-5" },
+            h("div", { className: `w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${complete ? "bg-brand-500 text-white" : "bg-brand-50 text-brand-600"}` }, h(Icon, { name: complete ? "check" : icon, size: 22 })),
+            h("div", { className: "min-w-0 flex-grow" },
+                h("h2", { className: "text-lg sm:text-xl font-bold text-stone-800" }, title),
+                subtitle && h("p", { className: "text-sm text-stone-500 mt-1 leading-relaxed" }, subtitle))),
+        h("div", { className: "space-y-2" }, children));
+}
+function HabitRows({ items, onToggle }) {
+    const h = React.createElement;
+    return items.map((item, index) => h("button", { key: item.id, type: "button", onClick: () => onToggle(index), className: `w-full flex items-center gap-3 p-3.5 rounded-2xl text-left border transition-all ${item.done ? "bg-brand-50/70 border-brand-100" : "bg-stone-50/70 border-transparent hover:border-stone-200"}` },
+        h("span", { className: `w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${item.done ? "bg-brand-500 text-white shadow-sm" : "bg-white border-2 border-stone-200 text-transparent"}` }, h(Icon, { name: "check", size: 18 })),
+        h("span", { className: `text-sm sm:text-base font-medium ${item.done ? "text-brand-800" : "text-stone-700"}` }, `${index + 1}. ${item.label}`)));
+}
+function BlockRows({ items, onUpdate }) {
+    const h = React.createElement;
+    return items.map((item, index) => h("div", { key: item.id, className: `flex items-center gap-3 p-3 rounded-2xl border transition-colors ${item.done ? "bg-brand-50/70 border-brand-100" : "bg-stone-50/70 border-transparent focus-within:border-brand-200"}` },
+        h("span", { className: "w-7 h-7 rounded-full bg-white text-stone-400 flex items-center justify-center text-xs font-bold shrink-0 border border-stone-100" }, index + 1),
+        h("input", { type: "text", value: item.title, onChange: event => onUpdate(index, { title: event.target.value }), placeholder: "Назва виконаного блоку...", className: `flex-grow min-w-0 bg-transparent text-sm sm:text-base font-medium ${item.done ? "text-stone-500 line-through" : "text-stone-800"} placeholder:text-stone-300` }),
+        h("button", { type: "button", onClick: () => onUpdate(index, { done: !item.done }), className: `w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${item.done ? "bg-brand-500 text-white shadow-sm" : "bg-white border-2 border-stone-200 text-transparent hover:border-brand-300"}`, title: item.done ? "Скасувати виконання" : "Позначити виконаним" }, h(Icon, { name: "check", size: 19 }))));
+}
+function MetricRows({ items, onChange }) {
+    const h = React.createElement;
+    return items.map((metric, index) => {
+        const done = metric.current >= metric.target;
+        const percent = Math.min(100, Math.round((metric.current / metric.target) * 100));
+        return h("div", { key: metric.id, className: `p-4 rounded-2xl border transition-colors ${done ? "bg-brand-50/70 border-brand-100" : "bg-stone-50/70 border-transparent"}` },
+            h("div", { className: "flex items-center gap-3" },
+                h("div", { className: `w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${done ? "bg-brand-500 text-white" : "bg-white text-stone-400 border border-stone-100"}` }, done ? h(Icon, { name: "check", size: 19 }) : index + 1),
+                h("div", { className: "flex-grow min-w-0" },
+                    h("div", { className: "font-semibold text-sm sm:text-base text-stone-800" }, metric.label),
+                    h("div", { className: "mt-2 h-1.5 bg-stone-200 rounded-full overflow-hidden" }, h("div", { className: "h-full bg-brand-500 rounded-full transition-all duration-300", style: { width: `${percent}%` } }))),
+                h("div", { className: "flex items-center gap-1.5 shrink-0" },
+                    h("button", { type: "button", onClick: () => onChange(index, -1), disabled: metric.current <= 0, className: "w-8 h-8 rounded-xl bg-white border border-stone-200 text-stone-500 flex items-center justify-center disabled:opacity-30 hover:border-brand-300", title: "Зменшити" }, h(Icon, { name: "remove", size: 17 })),
+                    h("span", { className: `min-w-[52px] text-center text-sm font-bold tabular-nums ${done ? "text-brand-700" : "text-stone-700"}` }, `${metric.current}/${metric.target}`),
+                    h("button", { type: "button", onClick: () => onChange(index, 1), disabled: done, className: "w-8 h-8 rounded-xl bg-stone-800 text-white flex items-center justify-center disabled:opacity-30 hover:bg-brand-600", title: "Додати" }, h(Icon, { name: "add", size: 17 })))));
+    });
+}
+function BadHabitRows({ items, onSetStatus }) {
+    const h = React.createElement;
+    return items.map((item, index) => h("div", { key: item.id, className: `flex items-center gap-3 p-3 rounded-2xl border transition-colors ${item.status === "success" ? "bg-brand-50/70 border-brand-100" : item.status === "failed" ? "bg-red-50 border-red-100" : "bg-stone-50/70 border-transparent"}` },
+        h("span", { className: "w-7 h-7 rounded-full bg-white text-stone-400 flex items-center justify-center text-xs font-bold shrink-0 border border-stone-100" }, index + 1),
+        h("span", { className: "flex-grow min-w-0 text-sm sm:text-base font-medium text-stone-700" }, item.label),
+        h("div", { className: "flex gap-1.5 shrink-0" },
+            h("button", { type: "button", onClick: () => onSetStatus(index, item.status === "success" ? null : "success"), className: `w-9 h-9 rounded-full flex items-center justify-center transition-all ${item.status === "success" ? "bg-brand-500 text-white shadow-sm" : "bg-white border border-stone-200 text-stone-300 hover:text-brand-500 hover:border-brand-300"}`, title: "Правило витримано" }, h(Icon, { name: "check", size: 19 })),
+            h("button", { type: "button", onClick: () => onSetStatus(index, item.status === "failed" ? null : "failed"), className: `w-9 h-9 rounded-full flex items-center justify-center transition-all ${item.status === "failed" ? "bg-red-500 text-white shadow-sm" : "bg-white border border-stone-200 text-stone-300 hover:text-red-500 hover:border-red-300"}`, title: "Правило порушено" }, h(Icon, { name: "close", size: 19 })))));
+}
+function DailyTrackerView({ identity, editDay }) {
+    const h = React.createElement;
+    const [records, setRecords] = useStoredState("ulsDayRecordsV1", {});
+    const [planTasks] = useStoredState("dailyPlanTasksV2", getInitialDailyTasks());
+    const [toast, setToast] = useState("");
+    const key = getDayKey(identity);
+    const baseRecord = getInitialDayRecord();
+    const savedRecord = records[key];
+    const record = savedRecord ? { ...baseRecord, ...savedRecord } : baseRecord;
+    const updateRecord = (updater) => {
+        const current = records[key] ? { ...getInitialDayRecord(), ...records[key] } : getInitialDayRecord();
+        const next = typeof updater === "function" ? updater(current) : { ...current, ...updater };
+        setRecords({ ...records, [key]: { ...next, updatedAt: new Date().toISOString() } });
+    };
+    const updateList = (listName, index, patch) => updateRecord(current => ({ ...current, [listName]: current[listName].map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item) }));
+    const showToast = (message) => {
+        setToast(message);
+        window.clearTimeout(showToast.timer);
+        showToast.timer = window.setTimeout(() => setToast(""), 2200);
+    };
+    const copyFullDay = async () => {
+        await copyTextToClipboard(buildFullDayText(identity, record, planTasks));
+        showToast("Повний план скопійовано для Telegram");
+    };
+    const assessedBadHabits = record.badHabits.filter(item => item.status).length;
+    const progressDone = record.morningHabits.filter(item => item.done).length
+        + record.workBlocks.filter(item => item.done).length
+        + record.studyBlocks.filter(item => item.done).length
+        + record.metrics.filter(item => item.current >= item.target).length
+        + assessedBadHabits
+        + (record.eveningDone ? 1 : 0);
+    const progressTotal = record.morningHabits.length + record.workBlocks.length + record.studyBlocks.length + record.metrics.length + record.badHabits.length + 1;
+    const progressPercent = Math.round((progressDone / progressTotal) * 100);
+    const morningComplete = record.morningHabits.every(item => item.done);
+    const workComplete = record.workBlocks.every(item => item.done);
+    const studyComplete = record.studyBlocks.every(item => item.done);
+    const metricsComplete = record.metrics.every(item => item.current >= item.target);
+    const badHabitsAssessed = record.badHabits.every(item => item.status);
+    return h("div", { className: "slide-up max-w-5xl mx-auto pb-12" },
+        h("header", { className: "relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-stone-800 via-stone-800 to-brand-800 text-white p-6 sm:p-8 mb-6 shadow-xl shadow-stone-800/10" },
+            h("div", { className: "absolute -right-16 -top-20 w-56 h-56 bg-brand-400/20 rounded-full blur-3xl" }),
+            h("div", { className: "relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6" },
+                h("div", null,
+                    h("div", { className: "text-brand-200 text-xs font-bold uppercase tracking-[0.24em] mb-3" }, "Daily system"),
+                    h("h1", { className: "text-2xl sm:text-4xl font-bold tracking-tight" }, `Viktor ULS | Day ${identity.dayNumber}`),
+                    h("div", { className: "mt-3 text-stone-200 text-base sm:text-lg flex items-center gap-2" }, h("span", null, "📅"), `Plan for ${formatDateShort(identity.date)}`)),
+                h("div", { className: "flex items-center gap-3" },
+                    h("div", { className: "px-4 py-2.5 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-sm" },
+                        h("div", { className: "text-2xl font-bold tabular-nums" }, `${progressPercent}%`),
+                        h("div", { className: "text-[10px] uppercase tracking-widest text-stone-300" }, "Прогрес")),
+                    h("button", { type: "button", onClick: editDay, className: "w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/20", title: "Змінити номер дня або дату" }, h(Icon, { name: "edit_calendar", size: 22 }))))),
+        h("div", { className: "grid lg:grid-cols-[1fr_285px] gap-6 items-start" },
+            h("div", { className: "space-y-5" },
+                h(TrackerSection, { icon: "wb_sunny", title: "Morning habits", subtitle: "Відмічайте кожну виконану ранкову звичку.", complete: morningComplete }, h(HabitRows, { items: record.morningHabits, onToggle: index => updateList("morningHabits", index, { done: !record.morningHabits[index].done }) })),
+                h(TrackerSection, { icon: "work_history", title: "5 work blocks", subtitle: "Назвіть кожен 60-хвилинний робочий блок і відмітьте його виконання.", complete: workComplete }, h(BlockRows, { items: record.workBlocks, onUpdate: (index, patch) => updateList("workBlocks", index, patch) })),
+                h(TrackerSection, { icon: "school", title: "2 study blocks", subtitle: "Два 60-хвилинні блоки для навчання.", complete: studyComplete }, h(BlockRows, { items: record.studyBlocks, onUpdate: (index, patch) => updateList("studyBlocks", index, patch) })),
+                h(TrackerSection, { icon: "monitoring", title: "Daily metrics", subtitle: "Додавайте прогрес крок за кроком — пункт закриється після досягнення норми.", complete: metricsComplete }, h(MetricRows, { items: record.metrics, onChange: (index, delta) => {
+                        const metric = record.metrics[index];
+                        const current = Math.max(0, Math.min(metric.target, metric.current + delta));
+                        updateList("metrics", index, { current });
+                    } })),
+                h(TrackerSection, { icon: "verified_user", title: "No bad habits", subtitle: "Галочка — правило витримано, хрестик — порушено. Повторне натискання прибирає статус.", complete: badHabitsAssessed }, h(BadHabitRows, { items: record.badHabits, onSetStatus: (index, status) => updateList("badHabits", index, { status }) })),
+                h(TrackerSection, { icon: "bedtime", title: "Evening habits", subtitle: "Останній крок перед закриттям дня.", complete: record.eveningDone },
+                    h(HabitRows, { items: [{ id: "evening-routine", label: "Routine before bed", done: record.eveningDone }], onToggle: () => updateRecord({ ...record, eveningDone: !record.eveningDone, closed: false }) }),
+                    h("button", { type: "button", disabled: !record.eveningDone, onClick: () => {
+                            if (record.closed) {
+                                updateRecord({ ...record, closed: false });
+                                showToast("День знову відкрито");
+                            }
+                            else {
+                                updateRecord({ ...record, closed: true });
+                                showToast("День закрито");
+                            }
+                        }, className: `mt-4 w-full h-13 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all ${record.closed ? "bg-brand-50 text-brand-700 border border-brand-200" : "bg-stone-800 text-white hover:bg-stone-900 disabled:opacity-35 disabled:cursor-not-allowed"}` },
+                        h(Icon, { name: record.closed ? "lock_open" : "lock", size: 19 }),
+                        record.closed ? "Відкрити день" : "Закрити день"))),
+            h("aside", { className: "lg:sticky lg:top-28 space-y-4" },
+                h("div", { className: "bg-white rounded-3xl p-5 shadow-soft border border-stone-100/60" },
+                    h("div", { className: "flex items-center justify-between mb-4" },
+                        h("div", null, h("div", { className: "text-3xl font-bold text-stone-800 tabular-nums" }, `${progressDone}/${progressTotal}`), h("div", { className: "text-sm text-stone-500 mt-1" }, "Зафіксовано сьогодні")),
+                        h("div", { className: `w-11 h-11 rounded-2xl flex items-center justify-center ${record.closed ? "bg-brand-500 text-white" : "bg-brand-50 text-brand-600"}` }, h(Icon, { name: record.closed ? "done_all" : "track_changes", size: 23 }))),
+                    h("div", { className: "h-2.5 bg-stone-100 rounded-full overflow-hidden" }, h("div", { className: "h-full bg-brand-500 rounded-full transition-all duration-500", style: { width: `${progressPercent}%` } })),
+                    record.closed && h("div", { className: "mt-4 py-2.5 px-3 rounded-xl bg-brand-50 text-brand-700 text-sm font-semibold flex items-center gap-2" }, h(Icon, { name: "verified", size: 18 }), "День закрито")),
+                h("div", { className: "bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-3xl p-5 shadow-float" },
+                    h("div", { className: "w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-4 border border-white/10" }, h(Icon, { name: "send", size: 21 })),
+                    h("h3", { className: "font-bold text-lg mb-1" }, "Telegram plan"),
+                    h("p", { className: "text-brand-100 text-sm leading-relaxed mb-5" }, "Скопіює повний шаблон дня. Список Daily plan береться з окремої сторінки плану."),
+                    h("button", { type: "button", onClick: copyFullDay, className: "w-full py-3.5 px-4 bg-white text-brand-700 rounded-2xl font-semibold hover:bg-brand-50 flex items-center justify-center gap-2 shadow-sm" }, h(Icon, { name: "content_copy", size: 18 }), "Копіювати весь день")),
+                h("div", { className: "bg-white rounded-3xl p-5 shadow-soft border border-stone-100/60 text-sm text-stone-500 leading-relaxed" },
+                    h("div", { className: "flex items-center gap-2 font-semibold text-stone-700 mb-2" }, h(Icon, { name: "info", size: 18, className: "text-brand-500" }), "Окреме копіювання"),
+                    "Кнопка копіювання на сторінці «План на день» продовжує копіювати лише список задач."))),
+        h("div", { className: `fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-stone-800 text-white shadow-xl shadow-stone-800/20 text-sm font-medium z-50 flex items-center gap-2 transition-all duration-300 ${toast ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"}` }, h(Icon, { name: "check_circle", size: 18, className: "text-brand-400" }), toast));
 }
 function DailyPlanView({ openFocusCreate }) {
     const [tasks, setTasks] = useStoredState("dailyPlanTasksV2", getInitialDailyTasks());
